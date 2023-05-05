@@ -1,0 +1,48 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "type": "shell",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "linux": {
+                "command": "bash",
+                "args": [
+                    "-c",
+                    "'./build.sh'"
+                ]
+            }
+        },
+        {
+            "label": "build & run",
+            "type": "shell",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "linux": {
+                "command": "bash",
+                "args": [
+                    "-c",
+                    "'./build.sh;bochs -qf .bochsrc -rc debug.rc'"
+                ]
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "clean",
+            "type": "shell",
+            "linux": {
+                "command": "bash",
+                "args": [
+                    "-c",
+                    "'pushd output; rm -rf *; cd ../build; rm -rf *; popd'"
+                ]
+            },
+            "problemMatcher": []
+        }
+    ]
+}

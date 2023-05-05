@@ -1,0 +1,23 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/include"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/x86_64-elf-gcc",
+            "cStandard": "c17",
+            "intelliSenseMode": "linux-gcc-x64",
+            "compilerArgs": [
+                "-Ttext 0x8000",
+                "-I${workspaceFolder}/include",
+                "-ffreestanding",
+                "-mno-red-zone",
+                "-m64",
+                "-nolibc"
+            ]
+        }
+    ],
+    "version": 4
+}
