@@ -1,11 +1,19 @@
 #include "kbhandler.h"
+#include "kbscancodeset1.h"
+
 
 u8 kbFlag = 0;
 u8 lastScancode = 0;
 
 void stdKbHandler(u8 scancode, u8 chr) {
     if (chr != 0) {
-        if (kbFlag & (LSHIFT | RSHIFT)) chr -= 0x20;
+        if (kbFlag & (LSHIFT | RSHIFT)) {
+            if (chr >= 'a' && chr <= 'z') {
+                chr -= 0x20;
+            } else {
+                chr = scanCodeLookupTableShifted[scancode];
+            }
+        }
         printChar(chr);
     } else {
         switch(scancode) {
@@ -14,7 +22,7 @@ void stdKbHandler(u8 scancode, u8 chr) {
                 printChar(0x20);
                 setCursorPosition(cursorPosition - 1);
                 break;
-            case 0x1c:  //Enter
+            case 0x1c:  //Return
                 printStr("\n\r");
                 break;
             case 0x2a:  //Left shift pressed
@@ -29,13 +37,19 @@ void stdKbHandler(u8 scancode, u8 chr) {
             case 0xb6:  //Right shift released
                 kbFlag &= ! RSHIFT;
                 break;
-            default:                
+            default:
         }
     }
 }
 
 void kbHandler0xe0(u8 scancode) {
     switch(scancode) {
+        case 0x1c:  //NumPad Return
+            printStr("\n\r");
+            break;
+        case 0x35:  //NumPad Divide
+            printChar('/');
+            break;
         case 0x47:  //Home
             setCursorPosition(cursorPosition -= cursorPosition % VGAWIDTH);
             break;
