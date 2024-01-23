@@ -5,6 +5,7 @@
 #include "textprint.h"
 #include "io.h"
 #include "kbscancodeset1.h"
+#include "klog.h"
 
 typedef struct idt64 {
     u16 offset_low;

@@ -4,9 +4,12 @@
 #include "io.h"
 #include "textmodecolorcodes.h"
 
+#include "klog.h"
+
 #define VGAMEMORY (u8 *)0xb8000
 #define VGAWIDTH 80
 #define VGAHEIGHT 25
+#define TABSIZE 4
 
 extern u16 cursorPosition;
 

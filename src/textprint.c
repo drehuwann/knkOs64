@@ -3,6 +3,7 @@
 u16 cursorPosition;
 
 void clearScreenC(u8 color) {
+    klog("in 'void clearScreenC(u8)'", __FILE__, __LINE__, TRACE);
     u64 val = 0;
     val += (u64)color << 8;
     val += (u64)color << 24;
@@ -14,10 +15,12 @@ void clearScreenC(u8 color) {
 }
 
 void clearScreen() {
+    klog("in 'void clearScreen()'", __FILE__, __LINE__, TRACE);
     clearScreenC(BACKGROUND_BLACK | FOREGROUND_WHITE);
 }
 
 void setCursorPosition(u16 pos) {
+    klog("in 'void setCursorPosition(u16)'", __FILE__, __LINE__, TRACE);
     if (pos > 1999) pos = 1999;
     outb(0x03d4, 0x0f);
     outb(0x03d5, (u8)(pos & 0xff));
@@ -48,6 +51,9 @@ void printStrC(const char *str, u8 color) {
     u16 index = cursorPosition;
     while (*pstr != 0) {
         switch(*pstr) {
+            case 0x09:
+                index += TABSIZE;
+                break;
             case 0x0a:
                 index += VGAWIDTH;
                 break;
@@ -66,6 +72,7 @@ void printStrC(const char *str, u8 color) {
 }
 
 void printStr(const char *str) {
+    klog("in 'void printStr(const char *)'", __FILE__, __LINE__, TRACE);
     printStrC(str, BACKGROUND_BLACK | FOREGROUND_WHITE);
 }
 

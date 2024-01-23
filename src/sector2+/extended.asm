@@ -2,8 +2,10 @@ jmp enterProtectedMode
 
 %include "gdt.asm"
 %include "detectmem.asm"
+%include "serial.asm"
 
 enterProtectedMode:
+    call detectCOM
     call detectMem
     call enableA20
     cli

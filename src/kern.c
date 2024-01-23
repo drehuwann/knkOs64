@@ -1,12 +1,25 @@
 #include "textprint.h"
+#include "klog.h"
 #include "idt.h"
 #include "kbhandler.h"
 #include "mmap.h"
 #include "heap.h"
 
 void _start() {
+    logLvl llvl = DEBUG;
     clearScreen();
     setCursorPosition(posFromCoords(0, 0));
+    printComPorts();
+    if (initComPort(1)) {
+        printStr("COM1 serial port succesfully initialized. ");
+        setCurrentLogLevel(llvl);
+        printStr("Log level set to ");
+        printStr(lvlStr[llvl]);
+    } else {
+        printStrC("Couldn't initialize COM1 serial port",
+            BACKGROUND_BLACK | FOREGROUND_RED);
+    }
+    printStr("\r\n");
     initIdt();
     mainkbhandler = kbHandler;
 

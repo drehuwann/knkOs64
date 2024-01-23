@@ -7,6 +7,7 @@ extern void load_idt();
 void (*mainkbhandler)(u8 scancode, u8 chr);
 
 void initIdt() {
+    klog("in 'void initIdt()'", __FILE__, __LINE__, DEBUG);
 
     _idt[1].zero = 0;
     _idt[1].offset_low = (u16)(((u64)&isr1 & 0x000000000000ffff));
