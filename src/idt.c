@@ -1,36 +1,51 @@
 #include "idt.h"
 
-extern idt64 _idt[256];
-extern u64 isr1;
-extern void load_idt();
+__attribute__((aligned(0x10))) static idt64 _idt[IDT_MAX_DESCRIPTORS];
 
-void (*mainkbhandler)(u8 scancode, u8 chr);
+static idtr64 idtr;
 
-void initIdt() {
-    klog("in 'void initIdt()'", __FILE__, __LINE__, DEBUG);
+extern isr IRQ_00h_x64, IRQ_01h_x64, IRQ_02h_x64, IRQ_03h_x64,
+    IRQ_04h_x64, IRQ_05h_x64, IRQ_06h_x64, IRQ_07h_x64, IRQ_08h_x64,
+    IRQ_0ah_x64, IRQ_0bh_x64, IRQ_0ch_x64, IRQ_0dh_x64, IRQ_0eh_x64,
+    IRQ_10h_x64, IRQ_11h_x64, IRQ_12h_x64, IRQ_13h_x64, IRQ_14h_x64,
+    isr0, isr1;
 
-    _idt[1].zero = 0;
-    _idt[1].offset_low = (u16)(((u64)&isr1 & 0x000000000000ffff));
-    _idt[1].offset_mid = (u16)(((u64)&isr1 & 0x00000000ffff0000) >> 16);
-    _idt[1].offset_hi = (u32)(((u64)&isr1 & 0xffffffff00000000) >> 32);
-    _idt[1].ist = 0x00;
-    _idt[1].selector = 0x08;
-    _idt[1].type_attr = 0x8e;
-    
-    remapPic();
+static bool vectors[IDT_MAX_DESCRIPTORS];
+static isr isrs[IDT_MAX_DESCRIPTORS];
 
-    outb(PIC1_DAT, 0xfd);
-    outb(PIC2_DAT, 0xff);
-    load_idt();
+void idt_set_descriptor(u8 vector, void *isr, u8 flags) {
+    idt64 *descriptor = &(_idt[vector]); 
+    descriptor->offset_low = (u16)((u64)isr & 0xffff);
+    descriptor->selector = 0x0008;  //codeSeg
+    descriptor->ist = 0x00;
+    descriptor->type_attr = flags;
+    descriptor->offset_mid = (u16)(((u64)isr >> 16) & 0xffff);
+    descriptor->offset_hi = (u32)(((u64)isr >> 32) & 0xffffffff);
+    descriptor->zero = 0x00000000;
 }
 
-void isr1_handler() {
-    u8 scancode = inb(0x60);
-    u8 chr = 0x00;
+void initIdt() {
+//    klog("in 'void initIdt()'", __FILE__, __LINE__, DEBUG);
+    idtr.limit = (u16)(16 * 256 - 1);
+    idtr.base = (u64)&_idt[0];
 
-    if (scancode < 0x50) chr = scanCodeLookupTable[scancode];
-    if (mainkbhandler != 0) mainkbhandler(scancode, chr);
-
-    outb(PIC1_CMD, 0x20);
-    outb(PIC2_CMD, 0x20);
+    // exceptions
+    for (u8 vector = 0; vector < 32; vector ++) {
+        if (vector == 0x08 || vector >= 0x0a && vector <= 0x0e ||
+                vector == 0x11 || vector == 0x15) {
+            // exception pushes errorcode
+            idt_set_descriptor(vector, exc_dflt_handler_err, IDT_GATE_TRAP);
+        } else {
+            idt_set_descriptor(vector, exc_dflt_handler, IDT_GATE_TRAP);
+        }
+    }
+    remapPic(); //init PIC1 @ 0x20 and PIC2 @0x28
+    for (u16 vec = 32; vec < IDT_MAX_DESCRIPTORS; vec ++) {
+        idt_set_descriptor((u8)(vec & 0xff), int_dflt_handler, IDT_GATE_INTR);        
+    }
+/*
+    outb(PIC1_DAT, 0xfd);
+    outb(PIC2_DAT, 0xff);
+*/
+    __asm__ volatile ("lidt %0"::"m"(idtr));
 }

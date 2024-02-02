@@ -1,7 +1,6 @@
 #include "kbhandler.h"
 #include "kbscancodeset1.h"
 
-
 u8 kbFlag = 0;
 u8 lastScancode = 0;
 

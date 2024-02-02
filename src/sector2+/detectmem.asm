@@ -11,7 +11,7 @@ detectMem:
     .re:
         mov eax, 0xe820
         mov ecx, 0x18
-        int 0x15
+        int 0x15            ; INT 15H, E820H - Query System Address Map
         cmp ebx, 0
         je .finished
         add di, 0x18

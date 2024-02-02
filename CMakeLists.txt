@@ -11,6 +11,8 @@ set (CMAKE_EXE_LINKER_FLAGS "-T\"link.ld\"")
 
 FILE (GLOB_RECURSE kernel_C_SOURCES "*.c")
 
+set_source_files_properties(src/interrupts.c PROPERTIES COMPILE_FLAGS "-mgeneral-regs-only")
+
 ADD_LIBRARY (kernel STATIC
                 ${kernel_C_SOURCES})
 

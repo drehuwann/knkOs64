@@ -43,8 +43,6 @@ startProtMode:
 [BITS 64]
 [extern _start]
 
-%include "idt.asm"
-
 enter64bits:
     mov rdi, 0xb8000
     mov rax, 0x2a202a202a202a20

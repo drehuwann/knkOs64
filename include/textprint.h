@@ -3,7 +3,7 @@
 #include "typedefs.h"
 #include "io.h"
 #include "textmodecolorcodes.h"
-
+#include "memory.h"
 #include "klog.h"
 
 #define VGAMEMORY (u8 *)0xb8000
@@ -15,6 +15,7 @@ extern u16 cursorPosition;
 
 void clearScreenC(u8 color);
 void clearScreen();
+void scrollUp();
 void setCursorPosition(u16 pos);
 u16 posFromCoords(u8 x, u8 y);
 void printCharC(char c, u8 color);

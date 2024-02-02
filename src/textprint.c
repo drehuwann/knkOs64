@@ -3,25 +3,40 @@
 u16 cursorPosition;
 
 void clearScreenC(u8 color) {
-    klog("in 'void clearScreenC(u8)'", __FILE__, __LINE__, TRACE);
+//    klog("in 'void clearScreenC(u8)'", __FILE__, __LINE__, TRACE);
     u64 val = 0;
     val += (u64)color << 8;
     val += (u64)color << 24;
     val += (u64)color << 40;
     val += (u64)color << 56;
-    for (u64 *it = (u64 *)VGAMEMORY; it < (u64 *)(VGAMEMORY + 4000); ++it) {
+    for (u64 *it = (u64 *)VGAMEMORY;
+            it < (u64 *)(VGAMEMORY + 2 * VGAWIDTH * VGAHEIGHT); ++it) {
         *it = val;
     }
 }
 
 void clearScreen() {
-    klog("in 'void clearScreen()'", __FILE__, __LINE__, TRACE);
+//    klog("in 'void clearScreen()'", __FILE__, __LINE__, TRACE);
     clearScreenC(BACKGROUND_BLACK | FOREGROUND_WHITE);
 }
 
+/** @brief scrolls up, line by line, with memcpy */
+void scrollUp() {
+    u16 *dst = (u16 *)VGAMEMORY;
+
+    //TODO save or send to serial the first line
+    for (u8 line = 1; line < VGAHEIGHT; line ++) {
+        u16 *src = dst + VGAWIDTH;
+        memcpy((void *)dst, (void *)src, 2 * VGAWIDTH);
+        dst = src;
+    }
+    memset((void *)dst, 0, 2 * VGAWIDTH); //clears the bottom line
+    setCursorPosition(cursorPosition - 2 * VGAWIDTH); // cursor -> one line up
+}
+
 void setCursorPosition(u16 pos) {
-    klog("in 'void setCursorPosition(u16)'", __FILE__, __LINE__, TRACE);
-    if (pos > 1999) pos = 1999;
+//    klog("in 'void setCursorPosition(u16)'", __FILE__, __LINE__, TRACE);
+    if (pos > 1999) scrollUp();
     outb(0x03d4, 0x0f);
     outb(0x03d5, (u8)(pos & 0xff));
     outb(0x03d4, 0x0e);
@@ -61,6 +76,10 @@ void printStrC(const char *str, u8 color) {
                 index -= index % VGAWIDTH;
                 break;
             default:
+                while (index > 1999) {
+                    scrollUp();
+                    index = cursorPosition;
+                }
                 *(VGAMEMORY + index * 2) = *pstr;
                 *(VGAMEMORY + index * 2 + 1) = color;
                 ++index;
@@ -72,7 +91,7 @@ void printStrC(const char *str, u8 color) {
 }
 
 void printStr(const char *str) {
-    klog("in 'void printStr(const char *)'", __FILE__, __LINE__, TRACE);
+//    klog("in 'void printStr(const char *)'", __FILE__, __LINE__, TRACE);
     printStrC(str, BACKGROUND_BLACK | FOREGROUND_WHITE);
 }
 

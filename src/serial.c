@@ -73,24 +73,29 @@ bool initComPort(const u8 port) {
 }
 
 bool serial_received() {
-   return (bool)(inb(usedPort + 5) & 1); // reads LSR:RBF
+    Init();
+    return (bool)(inb(usedPort + 5) & 1); // reads LSR:RBF
 }
  
 u8 read_serial() {
-   while (! serial_received()); // waits for serial read buffer 
-   return inb(usedPort);
+    Init();
+    while (! serial_received()); // waits for serial read buffer 
+    return inb(usedPort);
 }
 
 bool is_transmit_empty() {
-   return (bool)(inb(usedPort + 5) & 0x20); //reads LSR:THRE
+    Init();
+    return (bool)(inb(usedPort + 5) & 0x20); //reads LSR:THRE
 }
  
 void write_serial(u8 a) {
-   while (! is_transmit_empty()); // waits for room in serial write buffer
-   outb(usedPort, a);
+    Init();
+    while (! is_transmit_empty()); // waits for room in serial write buffer
+    outb(usedPort, a);
 }
 
 void pushStr2Serial(const u8 *str) {
+    Init();
     u8 c;
     while((c = *str)) {
         write_serial(c);

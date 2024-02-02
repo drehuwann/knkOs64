@@ -17,6 +17,14 @@
             }
         },
         {
+            "label": "objdump",
+            "type": "shell",
+            "linux": {
+                "command": "pushd ${workspaceFolder}/build/CMakeFiles/kernel.dir/src; objdump -Dj .text --visualize-jumps=color --disassembler-color=on -M intel ${fileBasenameNoExtension}.c.o | less -R; popd",
+                "problemMatcher": "$gcc"
+            }
+        },
+        {
             "label": "build & run",
             "type": "shell",
             "group": {
