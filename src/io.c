@@ -1,12 +1,12 @@
 #include "io.h"
 
 void outb(u16 port, u8 val) {
-    klog("in 'void outb(u16, u8)'", __FILE__, __LINE__, DEBUG);
+    // don't klog() there !! (reentrance);
     asm volatile ("outb %0, %1" : : "a"(val), "Nd"(port));
 }
 
 u8 inb(u16 port) {
-    klog("in 'u8 inb(u16)'", __FILE__, __LINE__, DEBUG);
+    // don't klog() there !! (reentrance);
     u8 retVal;
     asm volatile ("inb %1, %0" : "=a"(retVal) : "Nd"(port));
     return retVal;

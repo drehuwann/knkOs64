@@ -33,25 +33,39 @@ void pic_sendEOI(u8 irq)
 void exc00_handler(int_frame *frame) {
 //    klog("in 'void exc00_handler(int_frame *)'", __FILE__, __LINE__, ERROR);
     printStrC("Division by zero exception catched\n\r", exColor);
-    frame->rip ++;
+    frame->rip ++; //DIV or IDIV opcode size is 1
 }
 
 void exc01_handler(int_frame *frame) {
 //    klog("in 'void exc01_handler(int_frame *)'", __FILE__, __LINE__, ERROR);
+    bool isFault = false;
     printStrC("Harware debug exception catched\n\r", exColor);
     debregs drs;
     dr_clear(&drs);
     dr_get(&drs);
     dr_print(&drs);
 
-    //sets ResumeFlag to avoid reentrance
-    frame->rflags = frame->rflags | (1 << 16);
+    // fault if (Bn = 1 and (Gn or Ln = 1) and R/Wn = 0) or (BD = 1)
+    isFault = (drs.dr6 & (1 << 13)); //if (BD==1)
+    u8 index = 0;
+    while ((!isFault) && index < 4) {
+        isFault = (
+            (drs.dr6 & (1 << index)) &&
+            (drs.dr7 & (0b11 << (2 * index))) &&
+            (((drs.dr7) >> 16) & (0b11 << (4 * index)) == 0)
+        );
+        ++ index;
+    }
+
+    if (isFault) frame->rflags = frame->rflags | (1 << 16);
+    // sets ResumeFlag to avoid reentrance
 }
 
 void exc02_handler(int_frame *frame) {
+    PUSHALL
 //    klog("in 'void exc02_handler(int_frame *)'", __FILE__, __LINE__, ERROR);
     printStrC("Non maskable interrupt exception catched\n\r", exColor);
-
+    POPALL
 }
 
 void exc03_handler(int_frame *frame) {
@@ -68,7 +82,7 @@ void exc04_handler(int_frame *frame) {
     printStrC("Overflow exception catched\n\r", exColor);
 }
 
-void exc05_handler(int_frame *frame) {
+void exc05_handler(int_frame *frame) { //should not occur in 64bit mode !!
 //    klog("in 'void exc05_handler(int_frame *)'", __FILE__, __LINE__, ERROR);
     printStrC("BOUND range exception catched\n\r", exColor);
 }
@@ -86,6 +100,11 @@ void exc07_handler(int_frame *frame) {
 void exc08_handler(int_frame_err *frame) {
 //klog("in 'void exc08_handler(int_frame_err *)'", __FILE__, __LINE__, ERROR);
     printStrC("Double fault exception catched\n\r", exColor);
+    genregs grs;
+    gr_clear(&grs);
+    gr_get(&grs);
+    gr_print(&grs);
+    asm volatile("hlt");
 }
 
 void exc0a_handler(int_frame_err *frame) {

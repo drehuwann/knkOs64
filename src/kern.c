@@ -8,7 +8,7 @@
 #include "heap.h"
 
 void _start() {
-    logLvl llvl = NONE;
+    logLvl llvl = DEBUG;
     clearScreen();
     setCursorPosition(posFromCoords(0, 0));
     printComPorts();
@@ -98,21 +98,20 @@ void _start() {
         printStr(int2str(10 / ii));
         printStr("\n\r");
     }
-
-    // test #DB exception
-    asm volatile("int $1");
+// test #DB exception
     asm volatile("int1");
-    // test #NMI
+// test #NMI
     asm volatile("int $2");
-    // test #BP
-    asm volatile("int $3");
+// test #BP
     asm volatile("int3");
-    // test #OF
+// test #OF
     u8 i = 220;
     while ((i+=20) && (i < 250)) {
         asm volatile("jno 1f;int $4;1:"); //'into' equiv. in 64 bits mode
     }
-    // test #BR
+// test #BR
     asm volatile("int $5");
+// test #DF
+    asm volatile("int $8");
     return;
 }

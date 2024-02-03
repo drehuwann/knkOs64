@@ -1,6 +1,6 @@
 #include "textprint.h"
 
-u16 cursorPosition;
+s16 cursorPosition;  //should be signed to handle scrollUp limits
 
 void clearScreenC(u8 color) {
 //    klog("in 'void clearScreenC(u8)'", __FILE__, __LINE__, TRACE);
@@ -34,8 +34,9 @@ void scrollUp() {
     setCursorPosition(cursorPosition - 2 * VGAWIDTH); // cursor -> one line up
 }
 
-void setCursorPosition(u16 pos) {
+void setCursorPosition(s16 pos) {
 //    klog("in 'void setCursorPosition(u16)'", __FILE__, __LINE__, TRACE);
+    if (pos < 0) pos = 0;
     if (pos > 1999) scrollUp();
     outb(0x03d4, 0x0f);
     outb(0x03d5, (u8)(pos & 0xff));
@@ -91,7 +92,7 @@ void printStrC(const char *str, u8 color) {
 }
 
 void printStr(const char *str) {
-//    klog("in 'void printStr(const char *)'", __FILE__, __LINE__, TRACE);
+    klog("in 'void printStr(const char *)'", __FILE__, __LINE__, TRACE);
     printStrC(str, BACKGROUND_BLACK | FOREGROUND_WHITE);
 }
 

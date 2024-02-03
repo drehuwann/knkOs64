@@ -11,12 +11,12 @@
 #define VGAHEIGHT 25
 #define TABSIZE 4
 
-extern u16 cursorPosition;
+extern s16 cursorPosition;
 
 void clearScreenC(u8 color);
 void clearScreen();
 void scrollUp();
-void setCursorPosition(u16 pos);
+void setCursorPosition(s16 pos);
 u16 posFromCoords(u8 x, u8 y);
 void printCharC(char c, u8 color);
 void printChar(char c);

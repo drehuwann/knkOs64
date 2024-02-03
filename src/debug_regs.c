@@ -1,10 +1,7 @@
 #include "debug_regs.h"
 
-static bool debregs_got = false;
-
 void dr_clear(debregs *drs) {
     if (drs) memset((void *)drs, 0, sizeof(debregs));
-    debregs_got = false;
 }
 
 void dr_get(debregs *drs) {
@@ -37,7 +34,6 @@ void dr_get(debregs *drs) {
         asm volatile ("mov %%db5, %0":"=r"(retval));
         drs->dr7 = retval;
     }
-    debregs_got = true;
 }
 
 void dr_print(debregs *drs) {
@@ -57,6 +53,100 @@ void dr_print(debregs *drs) {
     printStr("\n\r");
     addr = drs->dr7;
     printStr("\t#DB7 = 0x");
+    printStr(hex2strq(addr));
+    printStr("\n\r");
+}
+
+void gr_clear(genregs *grs) {
+    if (grs) memset((void *)grs, 0, sizeof(genregs));
+}
+
+void gr_get(genregs *grs) {
+    u64 retval = 0;
+    asm volatile("mov %%rax, %0":"=r"(retval));
+    grs->rax = retval;
+    retval = 0;
+    asm volatile("mov %%rbx, %0":"=r"(retval));
+    grs->rbx = retval;
+    retval = 0;
+    asm volatile("mov %%rcx, %0":"=r"(retval));
+    grs->rcx = retval;
+    retval = 0;
+    asm volatile("mov %%rdx, %0":"=r"(retval));
+    grs->rdx = retval;
+    retval = 0;
+    asm volatile("mov %%rsi, %0":"=r"(retval));
+    grs->rsi = retval;
+    retval = 0;
+    asm volatile("mov %%rdi, %0":"=r"(retval));
+    grs->rdi = retval;
+    retval = 0;
+    asm volatile("mov %%r8, %0":"=r"(retval));
+    grs->r8 = retval;
+    retval = 0;
+    asm volatile("mov %%r9, %0":"=r"(retval));
+    grs->r9 = retval;
+    retval = 0;
+    asm volatile("mov %%r10, %0":"=r"(retval));
+    grs->r10 = retval;
+    retval = 0;
+    asm volatile("mov %%r11, %0":"=r"(retval));
+    grs->r11 = retval;
+    retval = 0;
+    asm volatile("mov %%r12, %0":"=r"(retval));
+    grs->r12 = retval;
+    retval = 0;
+    asm volatile("mov %%r13, %0":"=r"(retval));
+    grs->r13 = retval;
+    retval = 0;
+    asm volatile("mov %%r14, %0":"=r"(retval));
+    grs->r14 = retval;
+    retval = 0;
+    asm volatile("mov %%r15, %0":"=r"(retval));
+    grs->r15 = retval;
+}
+
+void gr_print(genregs *grs) {
+    u64 addr = grs->rax;
+    printStr("\trax = 0x");
+    printStr(hex2strq(addr));
+    addr = grs->rbx;
+    printStr("\trbx = 0x");
+    printStr(hex2strq(addr));
+    printStr("\n\r");
+    addr = grs->rcx;
+    printStr("\trcx = 0x");
+    printStr(hex2strq(addr));
+    addr = grs->rdx;
+    printStr("\trdx = 0x");
+    printStr(hex2strq(addr));
+    printStr("\n\r");
+    addr = grs->r8;
+    printStr("\tr8  = 0x");
+    printStr(hex2strq(addr));
+    addr = grs->r9;
+    printStr("\tr9  = 0x");
+    printStr(hex2strq(addr));
+    printStr("\n\r");
+    addr = grs->r10;
+    printStr("\tr10 = 0x");
+    printStr(hex2strq(addr));
+    addr = grs->r11;
+    printStr("\tr11 = 0x");
+    printStr(hex2strq(addr));
+    printStr("\n\r");
+    addr = grs->r12;
+    printStr("\tr12 = 0x");
+    printStr(hex2strq(addr));
+    addr = grs->r13;
+    printStr("\tr13 = 0x");
+    printStr(hex2strq(addr));
+    printStr("\n\r");
+    addr = grs->r14;
+    printStr("\tr14 = 0x");
+    printStr(hex2strq(addr));
+    addr = grs->r15;
+    printStr("\tr15 = 0x");
     printStr(hex2strq(addr));
     printStr("\n\r");
 }
