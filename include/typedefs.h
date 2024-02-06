@@ -14,4 +14,4 @@ typedef short s16;
 typedef int s32;
 typedef long long s64;
 
-typedef enum { false = 0, true }bool;
+typedef enum { false = 0, true } bool;

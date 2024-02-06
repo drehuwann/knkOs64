@@ -39,7 +39,7 @@ void initIdt() {
             idt_set_descriptor(vector, exc_dflt_handler, IDT_GATE_TRAP);
         }
     }
-    remapPic(); //init PIC1 @ 0x20 and PIC2 @0x28
+    pic_remap(); //init PIC1 @ 0x20 and PIC2 @0x28
     for (u16 vec = 32; vec < IDT_MAX_DESCRIPTORS; vec ++) {
         idt_set_descriptor((u8)(vec & 0xff), int_dflt_handler, IDT_GATE_INTR);        
     }

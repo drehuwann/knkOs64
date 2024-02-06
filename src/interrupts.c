@@ -24,12 +24,6 @@ void int_dflt_handler(int_frame *frame) {
     printStrC("Default interrupt handler\n\r", intColor);
 }
 
-void pic_sendEOI(u8 irq)
-{
-    if(irq >= 8) outb(PIC2_CMD, PIC_EOI);
-	outb(PIC1_CMD, PIC_EOI);
-}
-
 void exc00_handler(int_frame *frame) {
 //    klog("in 'void exc00_handler(int_frame *)'", __FILE__, __LINE__, ERROR);
     printStrC("Division by zero exception catched\n\r", exColor);
@@ -125,11 +119,47 @@ void exc0c_handler(int_frame_err *frame) {
 void exc0d_handler(int_frame_err *frame) {
 //klog("in 'void exc0d_handler(int_frame_err *)'", __FILE__, __LINE__, ERROR);
     printStrC("General protection exception catched\n\r", exColor);
+    u64 errcode = frame->errorcode;
+    printStr("\terrorcode = 0x");
+    printStr(hex2strq(errcode));
+    printStr("\n\r");
+    printStr("\tcs:rip = 0x");
+    printStr(hex2strw((u16)(frame->cs)));
+    printChar(':');
+    printStr(hex2strq(frame->rip));
+    printStr("\n\r");
+    printStr("\tss:rsp = 0x");
+    printStr(hex2strw((u16)(frame->ss)));
+    printChar(':');
+    printStr(hex2strq(frame->rsp));
+    printStr("\n\r");
+    printStr("\trflags = 0b");
+    printStr(bin2str(frame->rflags, 32));
+    printStr("\n\r");
+    asm volatile("1:hlt;jmp 1b");
 }
 
 void exc0e_handler(int_frame_err *frame) {
+    ctlregs crs;
+    cr_clear(&crs);
+    cr_get(&crs);
 //    klog("in 'void exc0e_handler(int_frame *)'", __FILE__, __LINE__, ERROR);
     printStrC("Page fault exception catched\n\r", exColor);
+    u64 errcode = frame->errorcode;
+    printStr("\t(u16)errorcode = 0b");
+    printStr(bin2str(errcode, 16));
+    printStr("\n\r");
+    cr_print(&crs);
+    printStr("\tIA32_EFER.LME is ");
+    u64 retval = 0;
+    asm volatile("pushq %%rcx; pushq %%rax; pushq %%rdx;\
+        mov $0xc0000080, %%ecx; rdmsr; movq %%rax, %0; popq %%rdx; popq %%rax;\
+        popq %%rcx;":"=r"(retval));
+    if (!(retval & (1 << 8))) { // IA-32e mode operation disabled.
+        printStr("un");
+    }
+    printStr("set.\n\r");
+    asm volatile("mov %0, %%cr2"::"r"(crs.cr2)); //restore cr2
 }
 
 void exc10_handler(int_frame *frame) {
@@ -158,13 +188,13 @@ void exc14_handler(int_frame *frame) {
 }
 
 void irq00_handler(int_frame *frame) {
-//    klog("in 'void irq00_handler(int_frame *)'", __FILE__, __LINE__, DEBUG);
+    klog("in 'void irq00_handler(int_frame *)'", __FILE__, __LINE__, TRACE);
     Tick();
     pic_sendEOI(PIC1_OFFSET + 0x00);
 }
 
 void irq01_handler(int_frame *frame) {
-//    klog("in 'void irq01_handler(int_frame *)'", __FILE__, __LINE__, DEBUG);
+    klog("in 'void irq01_handler(int_frame *)'", __FILE__, __LINE__, TRACE);
     u8 scancode = inb_wrap(0x60);
     u8 chr = 0x00;
 

@@ -150,3 +150,46 @@ void gr_print(genregs *grs) {
     printStr(hex2strq(addr));
     printStr("\n\r");
 }
+
+void cr_clear(ctlregs *crs) {
+    if (crs) memset((void *)crs, 0, sizeof(ctlregs));
+}
+
+void cr_get(ctlregs *crs) {
+    u64 retval = 0;
+    asm volatile("mov %%cr0, %0":"=r"(retval));
+    crs->cr0 = retval;
+    retval = 0;
+    asm volatile("mov %%cr2, %0":"=r"(retval));
+    crs->cr2 = retval;
+    retval = 0;
+    asm volatile("mov %%cr3, %0":"=r"(retval));
+    crs->cr3 = retval;
+    retval = 0;
+    asm volatile("mov %%cr4, %0":"=r"(retval));
+    crs->cr4 = retval;
+    retval = 0;
+    asm volatile("mov %%cr8, %0":"=r"(retval));
+    crs->cr8 = retval;
+}
+
+void cr_print(ctlregs *crs) {
+    u64 addr = crs->cr0;
+    printStr("\tcr0 = 0x");
+    printStr(hex2strq(addr));
+    addr = crs->cr2;
+    printStr("\tcr2 = 0x");
+    printStr(hex2strq(addr));
+    printStr("\n\r");
+    addr = crs->cr3;
+    printStr("\tcr3 = 0x");
+    printStr(hex2strq(addr));
+    addr = crs->cr4;
+    printStr("\tcr4  = 0x");
+    printStr(hex2strq(addr));
+    printStr("\n\r");
+    addr = crs->cr8;
+    printStr("\tcr8  = 0x");
+    printStr(hex2strq(addr));
+    printStr("\n\r");
+}

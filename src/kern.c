@@ -22,6 +22,7 @@ void _start() {
             BACKGROUND_BLACK | FOREGROUND_RED);
     }
     printStr("\r\n");
+    SetFrequency(100); //init kernel timer to 100 Hz
     initIdt();
     idt_set_descriptor(0x00, exc00_handler, IDT_GATE_TRAP);
     idt_set_descriptor(0x01, exc01_handler, IDT_GATE_TRAP);
@@ -65,7 +66,6 @@ void _start() {
     
     __asm__ volatile("sti");
 
-    SetFrequency(100); //init kernel timer to 100 Hz
     mainkbhandler = kbHandler;
 
     mmapentry **usablemmap = getUsableMemRegions();
@@ -88,6 +88,27 @@ void _start() {
     printStr(hex2str((void *)(heapzone->baseAddress)));
     printStr(" as heap.\n\rFeel free to malloc() !!!\n\r");
     printStr("Warning : realloc() doesn't preserve alignment.\n\r");
+    printStr(double2str(GetTimeSinceBoot(), 2));
+    printStr(" seconds elapsed since boot\n\r");
+
+//test varargs and kprintf
+    s16 a = -32;
+    const u8 st[] = "negative percentage";
+    u8 yes = 'Y';
+    u8 no = 'N';
+    arg_list *p_arglist =
+        arg_push((arg_list *)0, make_arg_vp((void **const)(&st)));
+    if (!(arg_push(p_arglist, make_arg_sw(&a)))) asm volatile("int $0x0d");
+    if (!(arg_push(p_arglist, make_arg_ub(&yes)))) asm volatile("int $0x0d");
+    if (!(arg_push(p_arglist, make_arg_ub(&no)))) asm volatile("int $0x0d");
+    kprintf("Did you see this %s : %d%% (%c/%c) ?", p_arglist);
+    printStr("\n\r");
+    if(p_arglist) free(p_arglist);
+//TODO valgrind this !
+
+    printStr(double2str(GetTimeSinceBoot(), 2));
+    printStr(" seconds elapsed since boot\n\r");
+
 //test #DE exception
     u8 ii = 1;
     while (ii) {
@@ -113,5 +134,7 @@ void _start() {
     asm volatile("int $5");
 // test #DF
     asm volatile("int $8");
+    printStr(double2str(GetTimeSinceBoot(), 2));
+    printStr(" seconds elapsed since boot\n\r");
     return;
 }

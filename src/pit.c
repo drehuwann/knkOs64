@@ -1,6 +1,6 @@
 #include "pit.h"
 
-double TimeSinceBoot = 0;
+static double TimeSinceBoot = 0;
 static u16 Divisor = 65535;
 static const u64 BaseFrequency = 1193182;
 
@@ -28,7 +28,7 @@ static const u64 BaseFrequency = 1193182;
     0            BCD/Binary mode: 0 = 16-bit binary, 1 = four-digit BCD
 */
 static bool init_pit() { //mode0, ch0, lo/hi, binary
-    klog("in 'bool init_pit()'", __FILE__, __LINE__, DEBUG);
+    klog("in 'bool init_pit()'", __FILE__, __LINE__, TRACE);
     static bool done = false;
     if (! done) {
         outb(PIT_CMD, 0b00110000);
@@ -49,7 +49,7 @@ void Sleep(u64 milliseconds) {
 }
 
 void SetDivisor(u16 divisor){
-    klog("in 'void SetDivisor(u16)'", __FILE__, __LINE__, DEBUG);
+    klog("in 'void SetDivisor(u16)'", __FILE__, __LINE__, TRACE);
     if (divisor < 100) divisor = 100;
     Divisor = divisor;
     outb(PIT_CH0, (u8)(divisor & 0x00ff));
@@ -61,10 +61,39 @@ u64 GetFrequency() {
 }
 
 void SetFrequency(u64 frequency) {
-    klog("in 'void SetFrequency(u64)'", __FILE__, __LINE__, DEBUG);
+    klog("in 'void SetFrequency(u64)'", __FILE__, __LINE__, TRACE);
     if (init_pit()) SetDivisor(BaseFrequency / frequency);
 }
 
+u16 read_pit_count(void) {
+	u16 count = 0;
+ 
+	// Disable interrupts
+	asm volatile ("cli");
+ 
+	// al = channel in bits 6 and 7, remaining bits clear
+	outb(PIT_CMD, 0b0000000);
+ 
+	count = inb(PIT_CH0);		// Low byte
+	count |= inb(PIT_CH0) << 8;		// High byte 
+	return count;
+}
+
+void set_pit_count(u16 count) {
+	// Disable interrupts
+	asm volatile("cli");
+ 
+	// Set low byte
+	outb(PIT_CH0, (u8)(count & 0xff));		// Low byte
+	outb(PIT_CH0, (u8)((count & 0xff00) >> 8));	// High byte
+}
+
 void Tick() {
-    TimeSinceBoot += 1 / (double)GetFrequency();
+    u64 freq = GetFrequency();
+    SetFrequency(freq);
+    TimeSinceBoot += 1 / (double)freq;
+}
+
+double GetTimeSinceBoot() {
+    return TimeSinceBoot;
 }

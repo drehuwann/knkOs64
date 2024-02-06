@@ -23,9 +23,9 @@ setupIdentityPaging:
     or eax, 1 << 5
     mov cr4, eax
 
-    mov ecx, 0xc0000080
+    mov ecx, 0xc0000080 ;IA32_EFER
     rdmsr
-    or eax, 1 << 8
+    or eax, 1 << 8      ;IA32_EFER.LME
     wrmsr
 
     mov eax, cr0

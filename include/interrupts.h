@@ -6,6 +6,7 @@
 #include "kbscancodeset1.h"
 #include "debug_regs.h"
 #include "pit.h"
+#include "pic.h"
 #include "textprint.h"
 #include "klog.h"
 

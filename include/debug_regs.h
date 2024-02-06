@@ -44,3 +44,20 @@ void gr_get(genregs *grs);
 
 /** @brief display general registers. */
 void gr_print(genregs *grs);
+
+typedef struct ctlregs {
+    u64 cr0;
+    u64 cr2;
+    u64 cr3;
+    u64 cr4;
+    u64 cr8;
+} ctlregs;
+
+/** @brief sets all control regs fields to zero */
+void cr_clear(ctlregs *crs);
+
+/** @brief set genregs with actual cpu state */
+void cr_get(ctlregs *crs);
+
+/** @brief display general registers. */
+void cr_print(ctlregs *crs);

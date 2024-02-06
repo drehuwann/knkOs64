@@ -49,7 +49,7 @@ u16 posFromCoords(u8 x, u8 y) {
     return y * VGAWIDTH + x;
 }
 
-void printCharC(char c, u8 color) {
+void printCharC(u8 c, u8 color) {
     if (c == 0x00) return;
     u16 index = cursorPosition;
     *(VGAMEMORY + index * 2) = c;
@@ -58,11 +58,11 @@ void printCharC(char c, u8 color) {
     setCursorPosition(index);
 }
 
-void printChar(char c) {
+void printChar(u8 c) {
     printCharC(c, BACKGROUND_BLACK | FOREGROUND_WHITE);
 }
 
-void printStrC(const char *str, u8 color) {
+void printStrC(const u8 *str, u8 color) {
     u8 *pstr = (u8 *)str;
     u16 index = cursorPosition;
     while (*pstr != 0) {
@@ -91,14 +91,12 @@ void printStrC(const char *str, u8 color) {
     setCursorPosition(cursorPosition);
 }
 
-void printStr(const char *str) {
+void printStr(const u8 *str) {
     klog("in 'void printStr(const char *)'", __FILE__, __LINE__, TRACE);
     printStrC(str, BACKGROUND_BLACK | FOREGROUND_WHITE);
 }
 
-char hex2strOutput[128];
-char int2strOutput[128];
-char float2strOutput[128];
+char strOutput[128];
 
 const char *hex2strq(u64 val) {
     u64 *pval = &val;
@@ -109,12 +107,12 @@ const char *hex2strq(u64 val) {
     for (i = 0; i < size; i++) {
         ptr = (u8 *)pval + i;
         temp = (*ptr & 0xf0) >> 4;
-        hex2strOutput[size - (2 * i + 1)] = temp + (temp > 9 ? 'A' - 10 : '0');
+        strOutput[size - (2 * i + 1)] = temp + (temp > 9 ? 'A' - 10 : '0');
         temp = (*ptr & 0x0f);
-        hex2strOutput[size - 2 * i] = temp + (temp > 9 ? 'A' - 10 : '0');
+        strOutput[size - 2 * i] = temp + (temp > 9 ? 'A' - 10 : '0');
     }
-    hex2strOutput[size + 1] = 0x00;
-    return hex2strOutput;
+    strOutput[size + 1] = 0x00;
+    return strOutput;
 }
 
 const char *hex2strd(u32 val) {
@@ -126,12 +124,12 @@ const char *hex2strd(u32 val) {
     for (i = 0; i < size; i++) {
         ptr = (u8 *)pval + i;
         temp = (*ptr & 0xf0) >> 4;
-        hex2strOutput[size - (2 * i + 1)] = temp + (temp > 9 ? 'A' - 10 : '0');
+        strOutput[size - (2 * i + 1)] = temp + (temp > 9 ? 'A' - 10 : '0');
         temp = (*ptr & 0x0f);
-        hex2strOutput[size - 2 * i] = temp + (temp > 9 ? 'A' - 10 : '0');
+        strOutput[size - 2 * i] = temp + (temp > 9 ? 'A' - 10 : '0');
     }
-    hex2strOutput[size + 1] = 0x00;
-    return hex2strOutput;
+    strOutput[size + 1] = 0x00;
+    return strOutput;
 }
 
 const char *hex2strw(u16 val) {
@@ -143,12 +141,12 @@ const char *hex2strw(u16 val) {
     for (i = 0; i < size; i++) {
         ptr = (u8 *)pval + i;
         temp = (*ptr & 0xf0) >> 4;
-        hex2strOutput[size - (2 * i + 1)] = temp + (temp > 9 ? 'A' - 10 : '0');
+        strOutput[size - (2 * i + 1)] = temp + (temp > 9 ? 'A' - 10 : '0');
         temp = (*ptr & 0x0f);
-        hex2strOutput[size - 2 * i] = temp + (temp > 9 ? 'A' - 10 : '0');
+        strOutput[size - 2 * i] = temp + (temp > 9 ? 'A' - 10 : '0');
     }
-    hex2strOutput[size + 1] = 0x00;
-    return hex2strOutput;
+    strOutput[size + 1] = 0x00;
+    return strOutput;
 }
 
 const char *hex2strb(u8 val) {
@@ -160,12 +158,12 @@ const char *hex2strb(u8 val) {
     for (i = 0; i < size; i++) {
         ptr = (u8 *)pval + i;
         temp = (*ptr & 0xf0) >> 4;
-        hex2strOutput[size - (2 * i + 1)] = temp + (temp > 9 ? 'A' - 10 : '0');
+        strOutput[size - (2 * i + 1)] = temp + (temp > 9 ? 'A' - 10 : '0');
         temp = (*ptr & 0x0f);
-        hex2strOutput[size - 2 * i] = temp + (temp > 9 ? 'A' - 10 : '0');
+        strOutput[size - 2 * i] = temp + (temp > 9 ? 'A' - 10 : '0');
     }
-    hex2strOutput[size + 1] = 0x00;
-    return hex2strOutput;
+    strOutput[size + 1] = 0x00;
+    return strOutput;
 }
 
 const char *hex2str(void *any) {
@@ -182,21 +180,21 @@ const char *int2str(s64 value) {
         size ++;
     }
     u8 remain, index = 0;
-    if (isNeg) int2strOutput[0] = '-';
+    if (isNeg) strOutput[0] = '-';
     while (value / 10 > 0) {
         remain = value % 10;
         value /= 10;
-        int2strOutput[size + isNeg - index ++] = remain + 0x30;
+        strOutput[size + isNeg - index ++] = remain + 0x30;
     }
     remain = value % 10;
-    int2strOutput[isNeg] = remain + 0x30;
-    int2strOutput[size + 1 + isNeg] = 0x00;
-    return int2strOutput;
+    strOutput[isNeg] = remain + 0x30;
+    strOutput[size + 1 + isNeg] = 0x00;
+    return strOutput;
 }
 
-const char *float2str(float value, u8 decimalPlaces) {
+const char *double2str(double value, u8 decimalPlaces) {
     char *intPtr = (char*)int2str((u64)value);
-    char *floatPtr = float2strOutput;
+    char *floatPtr = strOutput;
     while (*intPtr != 0x00) {
         *floatPtr ++ = *intPtr ++;
     }
@@ -210,5 +208,114 @@ const char *float2str(float value, u8 decimalPlaces) {
         *floatPtr ++ = digit + 0x30;
     }
     *floatPtr = 0x00;
-    return float2strOutput;
+    return strOutput;
+}
+
+const char *float2str(float value, u8 decimalPlaces) {
+    return double2str((double)value, decimalPlaces);
+}
+
+const char *bin2str(u64 value, u8 digits) {
+    if (digits > 64) digits = 64;
+    strOutput[digits] = 0x00;
+    do {
+        digits --;
+        strOutput[digits] = '0' + (value % 2);
+        value /= 2;
+    } while(digits != 0x00);
+    return strOutput;
+}
+
+void kprintf(const u8 *str, arg_list *args) {
+    //TODO make this robust with size tests
+    u8 c = 0x00;
+    while ((c = *str) != 0x00) {
+        argument *poppedArg = (argument *)0;
+        if (c == '%') {
+            c = *(++str);
+            switch(c) {
+                case '%':
+                    printChar(c);
+                    break;
+                case 0x00: //illegal
+                    asm volatile("int $0x0d"); // #GP exception
+                    --str; // to close loop on next iteration
+                    break;
+                case 'c':
+                    poppedArg = arg_pop(&args);
+                    printChar(*((u8 *)(poppedArg->arg_addr)));
+                    break;
+                case 's':
+                    poppedArg = arg_pop(&args);
+                    printStr((const u8 *)(poppedArg->arg_addr));
+                    break;
+                case 'd':
+                    poppedArg = arg_pop(&args);
+                    if (!poppedArg) {
+                        asm volatile("int $0x0d");
+                        break;
+                    }
+                    s64 value = 0;
+                    switch(poppedArg->size) {
+                        case 1:
+                            value = (s64)(*(s8 *)(poppedArg->arg_addr));
+                            break;
+                        case 2:
+                            value = (s64)(*(s16 *)(poppedArg->arg_addr));
+                            break;
+                        case 4:
+                            value = (s64)(*(s32 *)(poppedArg->arg_addr));
+                            break;
+                        case 8:
+                            value = *(s64 *)(poppedArg->arg_addr);
+                            break;
+                        default:
+                            asm volatile("int $0x0d");
+                            break;
+                    }
+                    printStr(int2str(value));
+                    break;
+                case 'x':
+                    poppedArg = arg_pop(&args);
+                    if (!poppedArg) {
+                        asm volatile("int $0x0d");
+                        break;
+                    }
+                    printStr("0x");
+                    switch(poppedArg->size) {
+                        case 1:
+                            u8 valb = *(u8 *)(poppedArg->arg_addr);
+                            printStr(hex2strb(valb));
+                            break;
+                        case 2:
+                            u16 valw = *(u16 *)(poppedArg->arg_addr);
+                            printStr(hex2strw(valw));
+                            break;
+                        case 4:
+                            u32 vald = *(u32 *)(poppedArg->arg_addr);
+                            printStr(hex2strd(vald));
+                            break;
+                        case 8:
+                            u64 valq = *(u64 *)(poppedArg->arg_addr);
+                            printStr(hex2strq(valq));
+                            break;
+                        default:
+                            asm volatile("int $0x0d");
+                            break;
+                    }
+                case 'p':
+                    poppedArg = arg_pop(&args);
+                    printStr("@0x");
+                    printStr(hex2strq(*((u64*)(poppedArg->arg_addr))));
+                    break;
+                default: //unhandled case DANGER !!
+                    asm volatile("int $0x0d");
+                    break;
+            }
+        } else {
+            printChar(c);            
+        }
+        if (poppedArg) free(poppedArg);
+        ++str;
+    }
 }

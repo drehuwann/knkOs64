@@ -3,7 +3,7 @@ PROGRAM_SPACE equ 0x8000
 ReadDisk:
     mov bx, PROGRAM_SPACE
     mov ah, 0x02            ; base function of int 0x13 : readDisk
-    mov al, 0x40            ; Number of sectors to read
+    mov al, 0x50            ; Number of sectors to read
     mov dl, [BOOT_DRIVE]
     mov ch, 0x00            ; Cylinder index
     mov dh, 0x00            ; Head index
