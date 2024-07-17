@@ -15,18 +15,18 @@ gdt_datadesc:
     db 10010010b        ; access byte
     db 11001111b        ; flags+limit[16:19]
     db 0x00             ; base[24:31]
-gdt_user_codedesc:
-    dw 0xffff           ; limit[0:15]
-    dw 0x0000           ; base[0:15]
-    db 0x00             ; base[16:23]
-    db 11111010b        ; access byte
-    db 11001111b        ; flags+limit[16:19]
-    db 0x00             ; base[24:31]
 gdt_user_datadesc:
     dw 0xffff           ; limit[0:15]
     dw 0x0000           ; base[0:15]
     db 0x00             ; base[16:23]
     db 11110010b        ; access byte
+    db 11001111b        ; flags+limit[16:19]
+    db 0x00             ; base[24:31]
+gdt_user_codedesc:
+    dw 0xffff           ; limit[0:15]
+    dw 0x0000           ; base[0:15]
+    db 0x00             ; base[16:23]
+    db 11111010b        ; access byte
     db 11001111b        ; flags+limit[16:19]
     db 0x00             ; base[24:31]
 gdt_tss_desc:

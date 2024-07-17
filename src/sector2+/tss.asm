@@ -33,3 +33,25 @@ tss_end:
 
 tss_limit equ tss_end - tss_start
 tss_base equ tss_start
+
+extern test_user_function   ; declared/definite in ring3.[h,c]
+
+jump_usermode:  ;enable system call extensions that enables sysret and syscall
+    mov rcx, 0xc0000080 ; IA32_EFER msr
+	rdmsr
+	or eax, 1           ; enable SYSCALL/SYSRET
+	wrmsr
+	mov rcx, 0xc0000081 ; IA32_STAR msr
+	rdmsr
+	mov edx, 0x00130008 ; (base kernel/user / (kernel CS) 
+	wrmsr
+    mov rcx, 0xc0000084 ; IA32_FMASK
+    mov edx, 0xffffffff
+    mov eax, 0xfffffffd
+    wrmsr
+	mov rcx, test_user_function ; to be loaded into RIP
+	mov r11, 0x202              ; to be loaded into EFLAGS. only IF is set.
+    mov [rsp0], rsp             ; save kernel stack pointer
+	o64 sysret                  ; sysretq
+
+GLOBAL jump_usermode

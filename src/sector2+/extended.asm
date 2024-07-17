@@ -52,6 +52,7 @@ enter64bits:
     rep stosq
     call createTSS
     call initTSS
+;    lgdt [gdt_descriptor]       ; reload gdt
     call activateSSE
     call _start
     jmp $

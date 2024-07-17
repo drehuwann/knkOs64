@@ -34,3 +34,8 @@ argument *arg_pop(arg_list **p_list);
 /// @param arg pointer on argument to push.
 /// @return listptr (or new allocated listptr) on Success. on Failure : nullptr
 arg_list *arg_push(arg_list *list, argument *const arg);
+
+/// @brief recursively pops args in list until list is freed.
+/// @warning ### Dangerous !!! ### 
+/// @param args the head of the list to be freed. 
+void arg_flush(arg_list *args);

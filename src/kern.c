@@ -6,6 +6,7 @@
 #include "kbhandler.h"
 #include "mmap.h"
 #include "heap.h"
+#include "ring3.h"
 
 void _start() {
     logLvl llvl = DEBUG;
@@ -109,6 +110,7 @@ void _start() {
     printStr(double2str(GetTimeSinceBoot(), 2));
     printStr(" seconds elapsed since boot\n\r");
 
+/*
 //test #DE exception
     u8 ii = 1;
     while (ii) {
@@ -136,5 +138,7 @@ void _start() {
     asm volatile("int $8");
     printStr(double2str(GetTimeSinceBoot(), 2));
     printStr(" seconds elapsed since boot\n\r");
+*/
+    jump_usermode();
     return;
 }

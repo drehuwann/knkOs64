@@ -31,6 +31,12 @@ arg_list *arg_push(arg_list *list, argument *const arg) {
     return list;
 }
 
+void arg_flush(arg_list *args) {
+    while (arg_pop(&args)) { 
+        //WARN : Leave this Scope empty !! except for DEBUG messages ;)
+    }
+}
+
 argument *make_arg_ub(u8 *const arg) {
     argument *toRet = malloc(sizeof(argument));
     if (toRet) {
