@@ -18,5 +18,4 @@ ADD_LIBRARY (kernel STATIC
 
 ADD_CUSTOM_COMMAND (TARGET kernel
         POST_BUILD
-        COMMAND x86_64-elf-ld -T \"link.ld\")
-
+        COMMAND x86_64-elf-ld -T \"link.ld\" --orphan-handling=discard)

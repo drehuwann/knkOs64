@@ -8,6 +8,11 @@
 #include "heap.h"
 #include "ring3.h"
 
+extern u8 _kernSize;
+
+extern u8 _btext, _etext, _bidt, _eidt, _brodata, _erodata, _bbss, _ebss,
+        _bdata, _edata;
+
 void _start() {
     logLvl llvl = DEBUG;
     clearScreen();
@@ -106,6 +111,34 @@ void _start() {
     printStr("\n\r");
     if(p_arglist) free(p_arglist);
 //TODO valgrind this !
+
+    printStr(int2str((s64)(&_kernSize)));
+    printStr(" : This is kernel size (in 512byte sectors)\n\r");
+    printStr(" .text is from 0x");
+    printStr(hex2str(&_btext));
+    printStr(" to 0x");
+    printStr(hex2str(&_etext));
+    printStr("\n\r");
+    printStr(" .idt is from 0x");
+    printStr(hex2str(&_bidt));
+    printStr(" to 0x");
+    printStr(hex2str(&_eidt));
+    printStr("\n\r");
+    printStr(" .rodata is from 0x");
+    printStr(hex2str(&_brodata));
+    printStr(" to 0x");
+    printStr(hex2str(&_erodata));
+    printStr("\n\r");
+    printStr(" .bss is from 0x");
+    printStr(hex2str(&_bbss));
+    printStr(" to 0x");
+    printStr(hex2str(&_ebss));
+    printStr("\n\r");
+    printStr(" .data is from 0x");
+    printStr(hex2str(&_bdata));
+    printStr(" to 0x");
+    printStr(hex2str(&_edata));
+    printStr("\n\r");
 
     printStr(double2str(GetTimeSinceBoot(), 2));
     printStr(" seconds elapsed since boot\n\r");

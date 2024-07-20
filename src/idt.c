@@ -1,6 +1,6 @@
 #include "idt.h"
 
-__attribute__((aligned(0x10))) static idt64 _idt[IDT_MAX_DESCRIPTORS];
+__attribute__((aligned(0x10))) extern idt64 _idt[IDT_MAX_DESCRIPTORS];
 
 static idtr64 idtr;
 
@@ -26,6 +26,7 @@ void idt_set_descriptor(u8 vector, void *isr, u8 flags) {
 
 void initIdt() {
 //    klog("in 'void initIdt()'", __FILE__, __LINE__, DEBUG);
+_BP_
     idtr.limit = (u16)(16 * 256 - 1);
     idtr.base = (u64)&_idt[0];
 
