@@ -1,4 +1,5 @@
 0x.... |      |
+0x.... | PMBM | physical memory bitmap
 0x.000 |      | <+ kernel .data
 0xn+xk |      |  | kernel .bss
 0xn+1k |      |  | kernel .rodata

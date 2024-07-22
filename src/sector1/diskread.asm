@@ -1,5 +1,5 @@
 PROGRAM_SPACE equ 0x8000
-KERN_SIZE equ 0x50
+KERN_SIZE equ 0x48
 
 ReadDisk:
     mov bx, PROGRAM_SPACE

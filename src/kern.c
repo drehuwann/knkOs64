@@ -140,6 +140,40 @@ void _start() {
     printStr(hex2str(&_edata));
     printStr("\n\r");
 
+    pmBitmapInit();
+    printStr("the first free mem page is ");
+    printStr(int2str((s64)pmBitmap_first_free()));
+    printStr("\n\r");
+
+    void *p1 = pm_alloc_block();
+    printStr("allocated page @0x");
+    printStr(hex2str(p1));
+    printStr("\n\r");
+    void *p2 = pm_alloc_block();
+    printStr("allocated page @0x");
+    printStr(hex2str(p2));
+    printStr("\n\r");
+    pm_free_block(p1);
+    printStr("freed page @0x");
+    printStr(hex2str(p1));
+    printStr("\n\r");
+    p1 = pm_alloc_block();
+    printStr("allocated page @0x");
+    printStr(hex2str(p1));
+    printStr("\n\r");
+    void *p3 = (void *)0x2000;
+    pm_free_block(p3);
+    printStr("tried to free page @0x");
+    printStr(hex2str(p3));
+    printStr("\n\r");
+    void *p4 = pm_alloc_block();
+    printStr("allocated page @0x");
+    printStr(hex2str(p4));
+    printStr("\n\r");
+    pm_free_block(p1); //freeing all
+    pm_free_block(p2);
+    pm_free_block(p4);
+
     printStr(double2str(GetTimeSinceBoot(), 2));
     printStr(" seconds elapsed since boot\n\r");
 
