@@ -1,0 +1,18 @@
+0x.... |      |
+0x.000 |      | <+ kernel .data
+0xn+xk |      |  | kernel .bss
+0xn+1k |      |  | kernel .rodata
+0xn000 | IDT  |  IDT
+0x.... |      |  ^
+0x.... |      |  | kernel .text
+0x8000 | KERN | +-
+0x7c00 | BOOT | ORG of bootloader. initial BP +
+0x.... |      |                               | stack
+0x.... |      |                               v
+0x5000 | MMAP | 24 byte entries
+0x4000 |  PT  | \
+0x3000 |  PD  | -\ initial identity paging
+0x2000 | PDPR | -/
+0x1000 | PML4 | /
+0x0400 | BDA  | Bios Data Area
+0x0000 |      |

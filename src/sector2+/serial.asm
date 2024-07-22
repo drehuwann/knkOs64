@@ -1,4 +1,4 @@
-;read infos in DBA (in low mem bios 0x400) to list serial ports available
+;read infos in BDA (in low mem bios 0x400) to list serial ports available
 ;copies bios detected COM ports into globals com[1..4]
 detectCOM:
     push cx

@@ -26,7 +26,6 @@ void idt_set_descriptor(u8 vector, void *isr, u8 flags) {
 
 void initIdt() {
 //    klog("in 'void initIdt()'", __FILE__, __LINE__, DEBUG);
-_BP_
     idtr.limit = (u16)(16 * 256 - 1);
     idtr.base = (u64)&_idt[0];
 
