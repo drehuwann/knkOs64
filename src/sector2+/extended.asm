@@ -36,6 +36,7 @@ startProtMode:
     mov gs, ax
     call detectCPUID
     call detectLongMode
+    call getMaxPhyAddr
     call setupIdentityPaging
     call EditGDT
     jmp codeSeg:enter64bits
@@ -46,6 +47,7 @@ startProtMode:
 [extern _start]
 
 enter64bits:
+    call preparePageFrameMask
     mov rdi, 0xb8000
     mov rax, 0x2a202a202a202a20
     mov ecx, 500
@@ -100,3 +102,20 @@ activateSSE:
     or eax, 0b1100000000
     mov cr4, rax
     ret
+
+preparePageFrameMask:
+    xor rax, rax
+    mov cl, [MaxPhyAddr]
+    sub cl, 0x0c
+    .loop:
+        shl rax, 1
+        inc rax
+        dec cl
+        jnz .loop
+    shl rax, 0x0c
+    mov [pageFrameMask], rax
+    ret
+
+pageFrameMask:
+    dq 0
+    GLOBAL pageFrameMask

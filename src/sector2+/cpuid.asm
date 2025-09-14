@@ -20,8 +20,18 @@ detectLongMode:
     jz noLongMode
     ret
 
+getMaxPhyAddr:
+    mov eax, 0x80000008
+    cpuid
+    mov [MaxPhyAddr], al
+    ret
+
 noLongMode:
     hlt                 ; no long mode support
 
 noCPUID:
     hlt                 ; no cpuid support
+
+MaxPhyAddr:
+    db 0
+    GLOBAL MaxPhyAddr

@@ -2,8 +2,8 @@
 
 mmapentry *usableMemRegions[MAXMEMREGIONS];
 
-extern u8 _kernend;
-u64 *pmBitmapAddr = (u64 *)(&_kernend); //put bitmap just above the kernel
+/// @brief physical address of page bitmap.
+u64 *const pmBitmapAddr = (u64 *)(&_kernend); 
 
 void printmmap(mmapentry *mmap, u16 pos) {
     setCursorPosition(pos);
