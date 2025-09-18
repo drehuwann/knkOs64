@@ -5,7 +5,7 @@ mmapentry *usableMemRegions[MAXMEMREGIONS];
 /// @brief physical address of page bitmap.
 u64 *const pmBitmapAddr = (u64 *)(&_kernend); 
 
-void printmmap(mmapentry *mmap, u16 pos) {
+void printmmap(const mmapentry *mmap, u16 pos) {
     setCursorPosition(pos);
     printStr("Memory base : 0x");
     printStr(hex2strq(mmap->baseAddress));

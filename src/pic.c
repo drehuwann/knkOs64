@@ -8,7 +8,7 @@ static u16 __pic_get_irq_reg(int ocw3) {
     outb(PIC2_CMD, ocw3);
     return (inb(PIC2_CMD) << 8) | inb(PIC1_CMD);
 }
- 
+
 void pic_disable(void) {
     outb(PIC1_DAT, 0xff);
     outb(PIC2_DAT, 0xff);
@@ -17,7 +17,7 @@ void pic_disable(void) {
 void pic_set_mask(u8 IRQline) {
     u16 port;
     u8 value;
- 
+
     if (IRQline < 8) {
         port = PIC1_DAT;
     } else {
@@ -25,13 +25,13 @@ void pic_set_mask(u8 IRQline) {
         IRQline -= 8;
     }
     value = inb(port) | (1 << IRQline);
-    outb(port, value);        
+    outb(port, value);
 }
- 
+
 void pic_clear_mask(u8 IRQline) {
     u16 port;
     u8 value;
- 
+
     if (IRQline < 8) {
         port = PIC1_DAT;
     } else {
@@ -39,21 +39,22 @@ void pic_clear_mask(u8 IRQline) {
         IRQline -= 8;
     }
     value = inb(port) & ~(1 << IRQline);
-    outb(port, value);        
+    outb(port, value);
 }
 
 u16 pic_get_irr(void) {
     return __pic_get_irq_reg(PIC_READ_IRR);
 }
- 
+
 u16 pic_get_isr(void) {
     return __pic_get_irq_reg(PIC_READ_ISR);
 }
 
 void pic_remap() {
-	u8 a1, a2; 
+	u8 a1;
+    	u8 a2;
 	a1 = inb(PIC1_DAT);                     // save masks
-	a2 = inb(PIC2_DAT); 
+	a2 = inb(PIC2_DAT);
 
     // starts the initialization sequence (in cascade mode)
 	outb(PIC1_CMD, ICW1_INIT | ICW1_ICW4);
@@ -66,11 +67,11 @@ void pic_remap() {
 
     // ICW3: tell Slave PIC its cascade identity (0000 0010)
 	outb(PIC2_DAT, 2);
- 
+
     // ICW4: have the PICs use 8086 mode (and not 8080 mode)
 	outb(PIC1_DAT, ICW4_8086);
 	outb(PIC2_DAT, ICW4_8086);
- 
+
 	outb(PIC1_DAT, a1);                     // restore saved masks.
 	outb(PIC2_DAT, a2);
 }

@@ -24,24 +24,24 @@ popd
 mark="-qf .bochsrc"
 switchOnOff="-rc debug.rc"
 file2feedSed="./.vscode/tasks.json" 
-target2link2=".bochsrc"
+host2link2=".bochsrc"
 # 
 #####################################33
 #   check if bochs is available
-BOCHS=$(which bochs)
-if [[ -n $BOCHS ]]; then
+HOST=$(which bochs)
+if [[ -n $HOST ]]; then
     # Frees the old symbolic sync `.bochsrc`
     rm .bochsrc
-    # Check if $BOCHS was built with gdbstub    
-    if [[ $(readelf -p .dynstr $BOCHS | grep gdbstub | wc -l) -ne 0 ]]; then
+    # Check if $BOCHS was built with gdbstub
+    if [[ $(readelf -p .dynstr $HOST | grep gdbstub | wc -l) -ne 0 ]]; then
         # Remove the switch from tasks.json
         sed -i "s/$switch[[:space:]]*//g" "$tasksJson"
         # Hook the symbolic link to the GDB_specific `.bochsrc`
-        ln -s .bochsrcGDB_noSMP $target2link2
+        ln -s .bochsrcGDB_noSMP $host2link2
     else
-        # gdbstub is not present : Add the switch into tasks.sjon
+        # gdbstub is not present : Add the switch into tasks.json
         sed -i "/$pattern/!{h;d}; /$text/!{s/$pattern/$pattern $text/;}" "$file2feedSed"
         # Hook the symbolic link to the SMP_specific `.bochsrc`
-        ln -s .bochsrcSMP_noGDB $target2link2
+        ln -s .bochsrcSMP_noGDB $host2link2
     fi
 fi
