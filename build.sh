@@ -11,9 +11,6 @@ pushd build
     cmake ../CMakeLists.txt -G "Unix Makefiles" -D CMAKE_C_COMPILER=x86_64-elf-gcc
     make
     x86_64-elf-ld -T link.ld -o kern.elf libkernel.a extended.o binaries.o
-    x86_64-elf-objcopy --only-keep-debug kern.elf kern.sym
-    x86_64-elf-objcopy --strip-debug kern.elf kern.bin
-    x86_64-elf-objcopy --add-gnu-debuglink=kern.sym kern.bin
 
     dd if=/dev/zero of=../output/knkOs64.img count=1008 bs=512
     dd if=bootloader.bin of=../output/knkOs64.img conv=notrunc

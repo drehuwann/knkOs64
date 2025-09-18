@@ -50,7 +50,7 @@ void kbHandler0xe0(u8 scancode) {
             printChar('/');
             break;
         case 0x47:  //Home
-            setCursorPosition(cursorPosition -= cursorPosition % VGAWIDTH);
+            setCursorPosition(cursorPosition - (cursorPosition % VGAWIDTH));
             break;
         case 0x48:  //Up
             setCursorPosition(cursorPosition - VGAWIDTH);
@@ -72,19 +72,17 @@ void kbHandler0xe0(u8 scancode) {
             setCursorPosition(cursorPosition + VGAWIDTH);
             break;
         case 0x51:  //PgDn
-            setCursorPosition(cursorPosition + VGAWIDTH * VGAHEIGHT);
+            setCursorPosition(1999); // no page scrolling for now 
             break;
         default:
     }
 }
 
 void kbHandler(u8 scancode, u8 chr) {
-    switch(lastScancode) {
-        case 0xe0:
-            kbHandler0xe0(scancode);
-            break;
-        default:
-            stdKbHandler(scancode, chr);
+    if (lastScancode == 0xe0) {
+        kbHandler0xe0(scancode);
+    } else {
+        stdKbHandler(scancode, chr);
     }
     lastScancode = scancode;
 }

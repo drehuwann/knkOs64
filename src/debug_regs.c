@@ -36,7 +36,7 @@ void dr_get(debregs *drs) {
     }
 }
 
-void dr_print(debregs *drs) {
+void dr_print(debregs const *drs) {
     u64 addr = 0;
     for (u8 i = 0; i < 4; i ++) {
         if ((addr = (drs->bp_addrs)[i]) != 0) {
@@ -106,7 +106,7 @@ void gr_get(genregs *grs) {
     grs->r15 = retval;
 }
 
-void gr_print(genregs *grs) {
+void gr_print(const genregs *grs) {
     u64 addr = grs->rax;
     printStr("\trax = 0x");
     printStr(hex2strq(addr));
@@ -173,7 +173,7 @@ void cr_get(ctlregs *crs) {
     crs->cr8 = retval;
 }
 
-void cr_print(ctlregs *crs) {
+void cr_print(const ctlregs *crs) {
     u64 addr = crs->cr0;
     printStr("\tcr0 = 0x");
     printStr(hex2strq(addr));
@@ -192,4 +192,48 @@ void cr_print(ctlregs *crs) {
     printStr("\tcr8  = 0x");
     printStr(hex2strq(addr));
     printStr("\n\r");
+}
+
+
+// Function to get IOPL
+u8 get_iopl_impl(const rflags *flags) {
+    return flags->iopl; // Return the I/O Privilege Level
+}
+
+// Function to print set flags
+void print_flags_impl(const rflags* flags) {
+    printStr("Flags:");
+    if (flags->carry) printStr(" CF");
+    if (flags->parity) printStr(" PF");
+    if (flags->adjust) printStr(" AF");
+    if (flags->zero) printStr(" ZF");
+    if (flags->sign) printStr(" SF");
+    if (flags->trap) printStr(" TF");
+    if (flags->interrupt) printStr(" IF");
+    if (flags->direction) printStr(" DF");
+    if (flags->overflow) printStr(" OF");
+    if (flags->nested_task) printStr(" NT");
+    if (flags->vif) printStr(" VIF");
+    if (flags->vip) printStr(" VIP");
+    if (flags->id) printStr(" ID");
+    printStr(" IOPL");
+    printStr(int2str(flags->get_iopl(flags)));
+    printStr("\r\n");
+}
+
+// Function to check if any flags are set based on a mask
+int check_flags_impl(const rflags *flags, u64 mask) {
+    return (flags->carry & (mask & 0x1)) ||
+           (flags->parity & (mask & 0x4)) ||
+           (flags->adjust & (mask & 0x10)) ||
+           (flags->zero & (mask & 0x40)) ||
+           (flags->sign & (mask & 0x80)) ||
+           (flags->trap & (mask & 0x100)) ||
+           (flags->interrupt & (mask & 0x200)) ||
+           (flags->direction & (mask & 0x400)) ||
+           (flags->overflow & (mask & 0x800)) ||
+           (flags->nested_task & (mask & 0x2000)) ||
+           (flags->vif & (mask & 0x4000)) ||
+           (flags->vip & (mask & 0x8000)) ||
+           (flags->id & (mask & 0x200000));
 }
