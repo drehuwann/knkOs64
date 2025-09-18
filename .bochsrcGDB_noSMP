@@ -49,3 +49,4 @@ com4: enabled=false
 parport1: enabled=true, file=none
 parport2: enabled=false
 usb_uhci: enabled=1, port1=none, options1=none, port2=none, options2=none
+gdbstub: enabled=1, port=1234, text_base=0, data_base=0, bss_base=0
