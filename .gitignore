@@ -2,3 +2,4 @@ build/
 output/
 .vscode/settings.json
 bochsout.txt
+gdb.gdb
