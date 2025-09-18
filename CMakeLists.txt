@@ -22,10 +22,4 @@ ADD_LIBRARY (kernel STATIC
 ADD_CUSTOM_COMMAND (TARGET kernel
         POST_BUILD
         COMMAND x86_64-elf-ld -T \"link.ld\" --orphan-handling=discard)
-
-ADD_CUSTOM_COMMAND(TARGET kernel
-        POST_BUILD
-        COMMAND x86_64-elf-objcopy --only-keep-debug $<TARGET_FILE:kernel> kernel.sym
-        COMMAND x86_64-elf-objcopy --strip-debug $<TARGET_FILE:kernel>
-        COMMAND x86_64-elf-objcopy --add-gnu-debuglink=kernel.sym $<TARGET_FILE:kernel>
 )
