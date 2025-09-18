@@ -69,7 +69,7 @@ static inline bool pmBitmap_test(u64 bit) {
 static u64 blk_count = 0;
 
 void pmBitmapInit() {
-    mmapentry *entry = (mmapentry*)0x5000;
+    mmapentry const *entry = (mmapentry*)0x5000;
     blk_count = 0;
     for (u8 i = 0; i < memRegionCnt; i++) {
         u64 base = entry->baseAddress;

@@ -35,7 +35,7 @@
                 "command": "bash",
                 "args": [
                     "-c",
-                    "'./build.sh;bochs -qf .bochsrc -rc debug.rc'"
+                    "./build.sh;bochs -qf .bochsrc "
                 ]
             },
             "problemMatcher": []

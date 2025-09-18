@@ -25,7 +25,7 @@ void *malloc(u64 size) {
                 memseghdr *newSegHdr = (memseghdr *)((u64)currMemSeg
                     + sizeof(memseghdr) + size);
                 newSegHdr->isFree = 1;
-                newSegHdr->memLength =((u64)currMemSeg->memLength
+                newSegHdr->memLength =(currMemSeg->memLength
                     - (sizeof(memseghdr) + size));
                 newSegHdr->nextFreeSeg = currMemSeg->nextFreeSeg;
                 newSegHdr->nextSeg = currMemSeg->nextSeg;
@@ -77,10 +77,10 @@ void *calloct(u64 num, u64 size) {
 
 void *realloc(void *addr, u64 newsize) {
     if (addr == (void *)0) return addr;
-    memseghdr *oldseghdr;
-    alignedmemseghdr *amsh = (alignedmemseghdr *)addr - 1;
+    const memseghdr *oldseghdr;
+    const alignedmemseghdr *amsh = (alignedmemseghdr *)addr - 1;
     if (amsh->isAligned) {
-        oldseghdr = (memseghdr *)(u64)amsh->memSegHdrAddr;
+        oldseghdr = (memseghdr *)amsh->memSegHdrAddr;
     } else {
         oldseghdr = ((memseghdr *)addr) - 1;
     }
@@ -89,10 +89,11 @@ void *realloc(void *addr, u64 newsize) {
     void *newmem = malloc(newsize);
     memcpy(newmem, addr, smallerSize);
     free(addr);
-    return(newmem);
+    return newmem;
 }
 
 void combinefreesegs(memseghdr *a, memseghdr *b) {
+    memseghdr *helper = (memseghdr *)0; /*used to chain derefencements*/
     if (a == b) return;
     if (a == (memseghdr *)0) return;
     if (b == (memseghdr *)0) return;
@@ -100,16 +101,22 @@ void combinefreesegs(memseghdr *a, memseghdr *b) {
         a->memLength += b->memLength + sizeof(memseghdr);
         a->nextSeg = b->nextSeg;
         a->nextFreeSeg = b->nextFreeSeg;
-        b->nextSeg->prevSeg = a;
-        b->nextSeg->prevFreeSeg = a;
-        b->nextFreeSeg->prevFreeSeg = a;
+        if ((helper = b->nextSeg) != (memseghdr *)0) {
+            helper->prevSeg = a;
+            helper->prevFreeSeg = a;
+        }
+        if ((helper = b->nextFreeSeg) != (memseghdr *)0)
+            helper->prevFreeSeg = a;
     } else {
         b->memLength += a->memLength + sizeof(memseghdr);
         b->nextSeg = a->nextSeg;
         b->nextFreeSeg = a->nextFreeSeg;
-        a->nextSeg->prevSeg = b;
-        a->nextSeg->prevFreeSeg = b;
-        a->nextFreeSeg->prevFreeSeg = b;
+        if ((helper = a->nextSeg) != (memseghdr *)0) {
+            helper->prevSeg = b;
+            helper->prevFreeSeg = b;
+        }
+        if ((helper = a->nextFreeSeg) != (memseghdr *)0)
+            helper->prevFreeSeg = b;
     }
 }
 
@@ -136,22 +143,22 @@ void *alignedAlloc(u64 alignment, u64 size) {
 
 void free(void *addr) {
     memseghdr *currmemseg;
-    alignedmemseghdr *amsh = (alignedmemseghdr *)addr - 1;
+    memseghdr *helper;
+    const alignedmemseghdr *amsh = (alignedmemseghdr *)addr - 1;
     if (amsh->isAligned) {
-        currmemseg = (memseghdr *)(u64)amsh->memSegHdrAddr;
+        currmemseg = (memseghdr *)amsh->memSegHdrAddr;
     } else {
         currmemseg = ((memseghdr *)addr) - 1;
     }
     currmemseg->isFree = 1;
     if (currmemseg < firstFreeMemSeg) firstFreeMemSeg = currmemseg;
-    if (currmemseg->nextFreeSeg != (memseghdr*)0) {
-        if (currmemseg->nextFreeSeg->prevFreeSeg < currmemseg)
-            currmemseg->nextFreeSeg->prevFreeSeg = currmemseg;
-    }
-    if (currmemseg->prevFreeSeg != (memseghdr*)0) {
-        if (currmemseg->prevFreeSeg->nextFreeSeg > currmemseg)
-            currmemseg->prevFreeSeg->nextFreeSeg = currmemseg;
-    }
+    if (((helper = currmemseg->nextFreeSeg) != (memseghdr*)0)
+        && (helper->prevFreeSeg < currmemseg))
+            helper->prevFreeSeg = currmemseg;
+    if (((helper = currmemseg->prevFreeSeg) != (memseghdr*)0)
+        && (helper->nextFreeSeg > currmemseg))
+            helper->nextFreeSeg = currmemseg;
+
     if (currmemseg->nextSeg != (memseghdr*)0) {
         currmemseg->nextSeg->prevSeg = currmemseg;
         if (currmemseg->nextSeg->isFree) {

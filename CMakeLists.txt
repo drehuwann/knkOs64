@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.31)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
@@ -8,7 +8,7 @@ project("knkOs")
 include_directories("${PROJECT_SOURCE_DIR}/src")
 
 set (CMAKE_C_FLAGS "-Ttext 0x8000 -I${PROJECT_SOURCE_DIR}/include -m64 -nolibc \
-                        -ffreestanding -mno-red-zone")
+                        -nostdinc -ffreestanding -mno-red-zone")
 set (CMAKE_EXE_LINKER_FLAGS "-T\"link.ld\"")
 
 FILE (GLOB_RECURSE kernel_C_SOURCES "*.c")
@@ -22,3 +22,10 @@ ADD_LIBRARY (kernel STATIC
 ADD_CUSTOM_COMMAND (TARGET kernel
         POST_BUILD
         COMMAND x86_64-elf-ld -T \"link.ld\" --orphan-handling=discard)
+
+ADD_CUSTOM_COMMAND(TARGET kernel
+        POST_BUILD
+        COMMAND x86_64-elf-objcopy --only-keep-debug $<TARGET_FILE:kernel> kernel.sym
+        COMMAND x86_64-elf-objcopy --strip-debug $<TARGET_FILE:kernel>
+        COMMAND x86_64-elf-objcopy --add-gnu-debuglink=kernel.sym $<TARGET_FILE:kernel>
+)
