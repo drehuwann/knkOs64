@@ -33,7 +33,6 @@ void scrollUp() {
 }
 
 void setCursorPosition(s16 pos) {
-//    klog("in 'void setCursorPosition(u16)'", __FILE__, __LINE__, TRACE);
     if (pos < 0) pos = 0;
     if (pos > 1999) scrollUp();
     outb(0x03d4, 0x0f);
@@ -93,9 +92,9 @@ void printStr(const u8 *str) {
     printStrC(str, BACKGROUND_BLACK | FOREGROUND_WHITE);
 }
 
-char strOutput[128];
+u8 strOutput[128];
 
-const char *hex2strq(u64 val) {
+const u8 *hex2strq(u64 val) {
     u64 *pval = &val;
     const u8 *ptr = 0;
     u8 temp = 0;
@@ -111,7 +110,7 @@ const char *hex2strq(u64 val) {
     return strOutput;
 }
 
-const char *hex2strd(u32 val) {
+const u8 *hex2strd(u32 val) {
     u32 *pval = &val;
     const u8 *ptr = 0;
     u8 temp = 0;
@@ -127,7 +126,7 @@ const char *hex2strd(u32 val) {
     return strOutput;
 }
 
-const char *hex2strw(u16 val) {
+const u8 *hex2strw(u16 val) {
     u16 *pval = &val;
     const u8 *ptr = 0;
     u8 temp = 0;
@@ -143,7 +142,7 @@ const char *hex2strw(u16 val) {
     return strOutput;
 }
 
-const char *hex2strb(u8 val) {
+const u8 *hex2strb(u8 val) {
     const u8 *pval = &val;
     const u8 *ptr = 0;
     u8 temp = 0;
@@ -159,11 +158,11 @@ const char *hex2strb(u8 val) {
     return strOutput;
 }
 
-const char *hex2str(void *any) {
+const u8 *hex2str(void *any) {
     return hex2strq((u64)any);
 }
 
-const char *int2str(s64 value) {
+const u8 *int2str(s64 value) {
     u8 isNeg = (value < 0);
     u8 size = 0;
     if (isNeg) value *= -1;
@@ -186,9 +185,9 @@ const char *int2str(s64 value) {
     return strOutput;
 }
 
-const char *double2str(double value, u8 decimalPlaces) {
-    char const *intPtr = int2str((u64)value);
-    char *floatPtr = strOutput;
+const u8 *double2str(double value, u8 decimalPlaces) {
+    u8 const *intPtr = int2str((u64)value);
+    u8 *floatPtr = strOutput;
     while (*intPtr != 0x00) {
         *floatPtr ++ = *intPtr ++;
     }
@@ -205,11 +204,11 @@ const char *double2str(double value, u8 decimalPlaces) {
     return strOutput;
 }
 
-const char *float2str(float value, u8 decimalPlaces) {
+const u8 *float2str(float value, u8 decimalPlaces) {
     return double2str((double)value, decimalPlaces);
 }
 
-const char *bin2str(u64 value, u8 digits) {
+const u8 *bin2str(u64 value, u8 digits) {
     if (digits > 64) digits = 64;
     strOutput[digits] = 0x00;
     do {
@@ -275,7 +274,7 @@ void kprintf(const u8 *str, arg_list *args) {
                         asm volatile("int $0x0d");
                         break;
                     }
-                    printStr("0x");
+                    printStr((const u8 *)"0x");
                     switch(poppedArg->size) {
                         case 1:
                             u8 valb = *(u8 *)(poppedArg->arg_addr);
@@ -297,9 +296,10 @@ void kprintf(const u8 *str, arg_list *args) {
                             asm volatile("int $0x0d");
                             break;
                     }
+                    break;
                 case 'p':
                     poppedArg = arg_pop(&args);
-                    printStr("@0x");
+                    printStr((const u8 *)"@0x");
                     printStr(hex2strq(*((u64*)(poppedArg->arg_addr))));
                     break;
                 default: //unhandled case DANGER !!

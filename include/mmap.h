@@ -14,9 +14,9 @@ extern u8 memRegionCnt;
 extern u8 usableMemRegionsCnt;
 
 /// @brief gnu-LD symbol : page-aligned end of kernel.
-extern u8 _kernend;
+extern u8 _kernend[];
 
-void printmmap(mmapentry *mmap, u16 pos);
+void printmmap(const mmapentry *mmap, u16 pos);
 mmapentry **getUsableMemRegions();
 mmapentry *getLargestUsableMemRegion();
 

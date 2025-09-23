@@ -4,9 +4,9 @@
 static u16 __pic_get_irq_reg(int ocw3) {
     /* OCW3 to PIC CMD to get the register values.  PIC2 is chained, and
      * represents IRQs 8-15.  PIC1 is IRQs 0-7, with 2 being the chain */
-    outb(PIC1_CMD, ocw3);
-    outb(PIC2_CMD, ocw3);
-    return (inb(PIC2_CMD) << 8) | inb(PIC1_CMD);
+    outb(PIC1_CMD, (u8)(ocw3 & 0xff));
+    outb(PIC2_CMD, (u8)(ocw3 & 0xff));
+    return (inb((u16)(PIC2_CMD << 8)) | inb((u16)PIC1_CMD));
 }
 
 void pic_disable(void) {
@@ -24,7 +24,7 @@ void pic_set_mask(u8 IRQline) {
         port = PIC2_DAT;
         IRQline -= 8;
     }
-    value = inb(port) | (1 << IRQline);
+    value = inb(port) | (u8)(1 << IRQline);
     outb(port, value);
 }
 

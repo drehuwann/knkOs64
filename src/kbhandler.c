@@ -22,7 +22,7 @@ void stdKbHandler(u8 scancode, u8 chr) {
                 setCursorPosition(cursorPosition - 1);
                 break;
             case 0x1c:  //Return
-                printStr("\n\r");
+                printStr((const u8 *)"\n\r");
                 break;
             case 0x2a:  //Left shift pressed
                 kbFlag |= LSHIFT;
@@ -44,7 +44,7 @@ void stdKbHandler(u8 scancode, u8 chr) {
 void kbHandler0xe0(u8 scancode) {
     switch(scancode) {
         case 0x1c:  //NumPad Return
-            printStr("\n\r");
+            printStr((const u8 *)"\n\r");
             break;
         case 0x35:  //NumPad Divide
             printChar('/');

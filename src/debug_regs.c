@@ -19,7 +19,7 @@ void dr_get(debregs *drs) {
     drs->bp_addrs[3] = retval;
     retval = 0;
     asm volatile("mov %%cr4, %0":"=r"(retval));
-    bool has_debug_xtension = (retval & 0b1000 != 0);
+    bool has_debug_xtension = ((retval & 0b1000) != 0);
     retval = 0;
     if (has_debug_xtension) {
         asm volatile ("mov %%db6, %0":"=r"(retval));
@@ -40,21 +40,21 @@ void dr_print(debregs const *drs) {
     u64 addr = 0;
     for (u8 i = 0; i < 4; i ++) {
         if ((addr = (drs->bp_addrs)[i]) != 0) {
-            printStr("\t#DB");
+            printStr((const u8 *)"\t#DB");
             printStr(int2str(i));
-            printStr(" @ 0x");
+            printStr((const u8 *)" @ 0x");
             printStr(hex2strq(addr));
-            printStr("\n\r");
+            printStr((const u8 *)"\n\r");
         }
     }
     addr = drs->dr6;
-    printStr("\t#DB6 = 0x");
+    printStr((const u8 *)"\t#DB6 = 0x");
     printStr(hex2strq(addr));
-    printStr("\n\r");
+    printStr((const u8 *)"\n\r");
     addr = drs->dr7;
-    printStr("\t#DB7 = 0x");
+    printStr((const u8 *)"\t#DB7 = 0x");
     printStr(hex2strq(addr));
-    printStr("\n\r");
+    printStr((const u8 *)"\n\r");
 }
 
 void gr_clear(genregs *grs) {
@@ -108,47 +108,47 @@ void gr_get(genregs *grs) {
 
 void gr_print(const genregs *grs) {
     u64 addr = grs->rax;
-    printStr("\trax = 0x");
+    printStr((const u8 *)"\trax = 0x");
     printStr(hex2strq(addr));
     addr = grs->rbx;
-    printStr("\trbx = 0x");
+    printStr((const u8 *)"\trbx = 0x");
     printStr(hex2strq(addr));
-    printStr("\n\r");
+    printStr((const u8 *)"\n\r");
     addr = grs->rcx;
-    printStr("\trcx = 0x");
+    printStr((const u8 *)"\trcx = 0x");
     printStr(hex2strq(addr));
     addr = grs->rdx;
-    printStr("\trdx = 0x");
+    printStr((const u8 *)"\trdx = 0x");
     printStr(hex2strq(addr));
-    printStr("\n\r");
+    printStr((const u8 *)"\n\r");
     addr = grs->r8;
-    printStr("\tr8  = 0x");
+    printStr((const u8 *)"\tr8  = 0x");
     printStr(hex2strq(addr));
     addr = grs->r9;
-    printStr("\tr9  = 0x");
+    printStr((const u8 *)"\tr9  = 0x");
     printStr(hex2strq(addr));
-    printStr("\n\r");
+    printStr((const u8 *)"\n\r");
     addr = grs->r10;
-    printStr("\tr10 = 0x");
+    printStr((const u8 *)"\tr10 = 0x");
     printStr(hex2strq(addr));
     addr = grs->r11;
-    printStr("\tr11 = 0x");
+    printStr((const u8 *)"\tr11 = 0x");
     printStr(hex2strq(addr));
-    printStr("\n\r");
+    printStr((const u8 *)"\n\r");
     addr = grs->r12;
-    printStr("\tr12 = 0x");
+    printStr((const u8 *)"\tr12 = 0x");
     printStr(hex2strq(addr));
     addr = grs->r13;
-    printStr("\tr13 = 0x");
+    printStr((const u8 *)"\tr13 = 0x");
     printStr(hex2strq(addr));
-    printStr("\n\r");
+    printStr((const u8 *)"\n\r");
     addr = grs->r14;
-    printStr("\tr14 = 0x");
+    printStr((const u8 *)"\tr14 = 0x");
     printStr(hex2strq(addr));
     addr = grs->r15;
-    printStr("\tr15 = 0x");
+    printStr((const u8 *)"\tr15 = 0x");
     printStr(hex2strq(addr));
-    printStr("\n\r");
+    printStr((const u8 *)"\n\r");
 }
 
 void cr_clear(ctlregs *crs) {
@@ -175,23 +175,23 @@ void cr_get(ctlregs *crs) {
 
 void cr_print(const ctlregs *crs) {
     u64 addr = crs->cr0;
-    printStr("\tcr0 = 0x");
+    printStr((const u8 *)"\tcr0 = 0x");
     printStr(hex2strq(addr));
     addr = crs->cr2;
-    printStr("\tcr2 = 0x");
+    printStr((const u8 *)"\tcr2 = 0x");
     printStr(hex2strq(addr));
-    printStr("\n\r");
+    printStr((const u8 *)"\n\r");
     addr = crs->cr3;
-    printStr("\tcr3 = 0x");
+    printStr((const u8 *)"\tcr3 = 0x");
     printStr(hex2strq(addr));
     addr = crs->cr4;
-    printStr("\tcr4  = 0x");
+    printStr((const u8 *)"\tcr4  = 0x");
     printStr(hex2strq(addr));
-    printStr("\n\r");
+    printStr((const u8 *)"\n\r");
     addr = crs->cr8;
-    printStr("\tcr8  = 0x");
+    printStr((const u8 *)"\tcr8  = 0x");
     printStr(hex2strq(addr));
-    printStr("\n\r");
+    printStr((const u8 *)"\n\r");
 }
 
 
@@ -202,23 +202,23 @@ u8 get_iopl_impl(const rflags *flags) {
 
 // Function to print set flags
 void print_flags_impl(const rflags* flags) {
-    printStr("Flags:");
-    if (flags->carry) printStr(" CF");
-    if (flags->parity) printStr(" PF");
-    if (flags->adjust) printStr(" AF");
-    if (flags->zero) printStr(" ZF");
-    if (flags->sign) printStr(" SF");
-    if (flags->trap) printStr(" TF");
-    if (flags->interrupt) printStr(" IF");
-    if (flags->direction) printStr(" DF");
-    if (flags->overflow) printStr(" OF");
-    if (flags->nested_task) printStr(" NT");
-    if (flags->vif) printStr(" VIF");
-    if (flags->vip) printStr(" VIP");
-    if (flags->id) printStr(" ID");
-    printStr(" IOPL");
+    printStr((const u8 *)"Flags:");
+    if (flags->carry) printStr((const u8 *)" CF");
+    if (flags->parity) printStr((const u8 *)" PF");
+    if (flags->adjust) printStr((const u8 *)" AF");
+    if (flags->zero) printStr((const u8 *)" ZF");
+    if (flags->sign) printStr((const u8 *)" SF");
+    if (flags->trap) printStr((const u8 *)" TF");
+    if (flags->interrupt) printStr((const u8 *)" IF");
+    if (flags->direction) printStr((const u8 *)" DF");
+    if (flags->overflow) printStr((const u8 *)" OF");
+    if (flags->nested_task) printStr((const u8 *)" NT");
+    if (flags->vif) printStr((const u8 *)" VIF");
+    if (flags->vip) printStr((const u8 *)" VIP");
+    if (flags->id) printStr((const u8 *)" ID");
+    printStr((const u8 *)" IOPL");
     printStr(int2str(flags->get_iopl(flags)));
-    printStr("\r\n");
+    printStr((const u8 *)"\r\n");
 }
 
 // Function to check if any flags are set based on a mask

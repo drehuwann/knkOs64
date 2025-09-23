@@ -27,7 +27,7 @@ static bool init_serial(u8 portNum) {
     if (isInitialized) return true;
     u16 port = 0x0000;
     usedPort = port;
-    if (portNum == 0 || portNum > 4 || (port = comPorts[portNum -1]) == 0)
+    if ((port = comPorts[portNum -1]) == 0 || portNum == 0 || portNum > 4)
         return false;
     outb(port + 1, 0x00);    // Disable all interrupts
     outb(port + 3, 0x80);    // Enable DLAB (set baud rate divisor)
@@ -54,17 +54,17 @@ static bool init_serial(u8 portNum) {
 
 void printComPorts() {
     Init();
-    printStr("Available ports for serial kernel debugging :");
+    printStr((const u8 *)"Available ports for serial kernel debugging :");
     u8 index = 0;
     while (index < 4 && comPorts[index] != 0) {
-        printStr("\r\n\tCOM");
+        printStr((const u8 *)"\r\n\tCOM");
         printStr(int2str((u64)index + 1));
-        printStr(" : port 0x");
+        printStr((const u8 *)" : port 0x");
         printStr(hex2strw(comPorts[index]));
         ++index;
     }
-    if (index == 0) printStr(" None");
-    printStr("\r\n");
+    if (index == 0) printStr((const u8 *)" None");
+    printStr((const u8 *)"\r\n");
 }
 
 bool initComPort(const u8 port) {

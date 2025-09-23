@@ -80,7 +80,7 @@ void *realloc(void *addr, u64 newsize) {
     const memseghdr *oldseghdr;
     const alignedmemseghdr *amsh = (alignedmemseghdr *)addr - 1;
     if (amsh->isAligned) {
-        oldseghdr = (memseghdr *)amsh->memSegHdrAddr;
+        oldseghdr = (memseghdr *)(u64)(amsh->memSegHdrAddr);
     } else {
         oldseghdr = ((memseghdr *)addr) - 1;
     }
@@ -146,7 +146,7 @@ void free(void *addr) {
     memseghdr *helper;
     const alignedmemseghdr *amsh = (alignedmemseghdr *)addr - 1;
     if (amsh->isAligned) {
-        currmemseg = (memseghdr *)amsh->memSegHdrAddr;
+        currmemseg = (memseghdr *)(u64)(amsh->memSegHdrAddr);
     } else {
         currmemseg = ((memseghdr *)addr) - 1;
     }

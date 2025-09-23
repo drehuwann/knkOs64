@@ -26,8 +26,8 @@ extern isr IRQ_14h_x64;
 extern isr isr0;
 extern isr isr1;
 
-static bool vectors[IDT_MAX_DESCRIPTORS];
-static isr isrs[IDT_MAX_DESCRIPTORS];
+//static bool vectors[IDT_MAX_DESCRIPTORS];
+//static isr isrs[IDT_MAX_DESCRIPTORS];
 
 void idt_set_descriptor(u8 vector, void *isr, u8 flags) {
     idt64 *descriptor = &(_idt[vector]); 
@@ -41,13 +41,13 @@ void idt_set_descriptor(u8 vector, void *isr, u8 flags) {
 }
 
 void initIdt() {
-    klog("in 'void initIdt()'", __FILE__, __LINE__, DEBUG);
+    klog((const u8 *)"in 'void initIdt()'", (const u8 *)__FILE__, __LINE__, DEBUG);
     idtr.limit = (u16)(16 * 256 - 1);
     idtr.base = (u64)&_idt[0];
 
     // exceptions
     for (u8 vector = 0; vector < 32; vector ++) {
-        if (vector == 0x08 || vector >= 0x0a && vector <= 0x0e ||
+        if (vector == 0x08 || (vector >= 0x0a && vector <= 0x0e) ||
                 vector == 0x11 || vector == 0x15) {
             // exception pushes errorcode
             idt_set_descriptor(vector, &exc_dflt_handler_err, IDT_GATE_TRAP);

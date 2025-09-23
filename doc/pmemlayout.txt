@@ -16,4 +16,24 @@
 0x2000 | PDPR | -/
 0x1000 | PML4 | /
 0x0400 | BDA  | Bios Data Area
-0x0000 |      |
+0x0000 |      | Bios IVT
+
+
+global symbols defined in kernel_symbols.h :
+********************************************
+| Symbol     | Section/Area | Role                                    | Typical use           |
+|------------|--------------|-----------------------------------------|-----------------------|
+| _begin     | Global       | Physical start of kernel image          | Size calc, map bounds |
+| _kernend   | Global       | Physical end of kernel image            | End of ident. mapping |
+| _btext     | .text        | Start of kernel code                    | Map code, RO+exec     |
+| _etext     | .text        | End of kernel code                      | Code map limit        |
+| _bidt      | .idt         | Start of IDT page                       | Map IDT, maybe RO     |
+| _idt       | .idt         | IDT base address                        | lidt load             |
+| _eidt      | .idt         | End of IDT page                         | IDT map limit         |
+| _brodata   | .rodata      | Start of read-only data                 | Map RO, NX            |
+| _erodata   | .rodata      | End of read-only data                   | RO map limit          |
+| _bbss      | .bss         | Start of zero-initialized data          | Map RW, NX            |
+| _ebss      | .bss         | End of zero-initialized data            | RW map limit          |
+| _bdata     | .data        | Start of initialized data               | Map RW, NX            |
+| _edata     | .data        | End of initialized data                 | RW map limit          |
+| _kernSize  | Global       | Kernel size in 512-byte sectors         | Boot info, size calc  |

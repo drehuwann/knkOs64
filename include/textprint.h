@@ -24,17 +24,17 @@ void printChar(u8 c);
 void printStrC(const u8 *str, u8 color);
 void printStr(const u8 *str);
 
-extern char strOutput[128];
+extern u8 strOutput[128];
 
-const char *hex2strq(u64 val);
-const char *hex2strd(u32 val);
-const char *hex2strw(u16 val);
-const char *hex2strb(u8 val);
-const char *hex2str(void *any);
-const char *int2str(s64 value);
-const char *double2str(double value, u8 decimalPlaces);
-const char *float2str(float value, u8 decimalPlaces);
-const char *bin2str(u64 value, u8 digits);
+const u8 *hex2strq(u64 val);
+const u8 *hex2strd(u32 val);
+const u8 *hex2strw(u16 val);
+const u8 *hex2strb(u8 val);
+const u8 *hex2str(void *any);
+const u8 *int2str(s64 value);
+const u8 *double2str(double value, u8 decimalPlaces);
+const u8 *float2str(float value, u8 decimalPlaces);
+const u8 *bin2str(u64 value, u8 digits);
 
 /** @brief kernel mode printf like utility */
 void kprintf(const u8 *str, arg_list *args);

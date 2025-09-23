@@ -12,27 +12,27 @@ __attribute__((no_caller_saved_registers)) static u8 inb_wrap(u8 port) {
 }
 
 void exc_dflt_handler(const int_frame */*frame*/) {
-    printStrC("Default exception handler, no errorcode\n\r", exColor);
+    printStrC((const u8 *)"Default exception handler, no errorcode\n\r", exColor);
 }
 
 void exc_dflt_handler_err(const int_frame_err *frame) {
-    printStrC("Default exception handler, errorcode : 0x", exColor);
+    printStrC((const u8 *)"Default exception handler, errorcode : 0x", exColor);
     printStrC(hex2strq(frame->errorcode), exColor);
-    printStr("\n\r");
+    printStr((const u8 *)"\n\r");
 }
 
 void int_dflt_handler(const int_frame */*frame*/) {
-    printStrC("Default interrupt handler\n\r", intColor);
+    printStrC((const u8 *)"Default interrupt handler\n\r", intColor);
 }
 
 void exc00_handler(int_frame *frame) {
-    printStrC("Division by zero exception catched\n\r", exColor);
+    printStrC((const u8 *)"Division by zero exception catched\n\r", exColor);
     frame->rip ++; //DIV or IDIV opcode size is 1
 }
 
 void exc01_handler(int_frame *frame) {
     bool isFault = false;
-    printStrC("Harware debug exception catched\n\r", exColor);
+    printStrC((const u8 *)"Harware debug exception catched\n\r", exColor);
     debregs drs;
     dr_clear(&drs);
     dr_get(&drs);
@@ -45,7 +45,7 @@ void exc01_handler(int_frame *frame) {
         isFault = (
             (drs.dr6 & (1 << index)) &&
             (drs.dr7 & (0b11 << (2 * index))) &&
-            (((drs.dr7) >> 16) & (0b11 << (4 * index)) == 0)
+            ((((drs.dr7) >> 16) & (0b11 << (4 * index))) == 0)
         );
         ++ index;
     }
@@ -56,39 +56,39 @@ void exc01_handler(int_frame *frame) {
 
 void exc02_handler(const int_frame */*frame*/) {
     PUSHALL
-    printStrC("Non maskable interrupt exception catched\n\r", exColor);
+    printStrC((const u8 *)"Non maskable interrupt exception catched\n\r", exColor);
     POPALL
 }
 
 void exc03_handler(const int_frame *frame) {
-    printStrC("Software debug exception catched\n\r", exColor);
+    printStrC((const u8 *)"Software debug exception catched\n\r", exColor);
     debregs drs;
     dr_clear(&drs);
     dr_get(&drs);
     dr_print(&drs);
-    printStr("\tcs:rip = 0x");
+    printStr((const u8 *)"\tcs:rip = 0x");
     printStr(hex2strw((u16)(frame->cs)));
     printChar(':');
     printStr(hex2strq(frame->rip));
-    printStr("\n\r");
-    printStr("\tss:rsp = 0x");
+    printStr((const u8 *)"\n\r");
+    printStr((const u8 *)"\tss:rsp = 0x");
     printStr(hex2strw((u16)(frame->ss)));
     printChar(':');
     printStr(hex2strq(frame->rsp));
-    printStr("\n\r");
-    printStr("\trflags = 0b");
+    printStr((const u8 *)"\n\r");
+    printStr((const u8 *)"\trflags = 0b");
     printStr(bin2str(frame->rflags, 32));
-    printStr("\n\r");
-    printStr("\tIA32_EFER.LME is ");
+    printStr((const u8 *)"\n\r");
+    printStr((const u8 *)"\tIA32_EFER.LME is ");
     u64 retval = 0;
     asm volatile("pushq %%rcx; pushq %%rax; pushq %%rdx; mov $0xc0000080, %%ecx; "
         "rdmsr; movq %%rax, %0; popq %%rdx; popq %%rax; popq %%rcx;"
         :"=r"(retval)
     );
     if (!(retval & (1 << 8))) { // IA-32e mode operation disabled.
-        printStr("un");
+        printStr((const u8 *)"un");
     }
-    printStr("set.\n\r");
+    printStr((const u8 *)"set.\n\r");
     genregs grs;
     gr_clear(&grs);
     gr_get(&grs);
@@ -96,29 +96,29 @@ void exc03_handler(const int_frame *frame) {
 }
 
 void exc04_handler(const int_frame */*frame*/) {
-    printStrC("Overflow exception catched\n\r", exColor);
+    printStrC((const u8 *)"Overflow exception catched\n\r", exColor);
 }
 
 void exc05_handler(const int_frame */*frame*/) { //should not occur in 64bit mode !!
-    printStrC("BOUND range exception catched\n\r", exColor);
+    printStrC((const u8 *)"BOUND range exception catched\n\r", exColor);
 }
 
 void exc06_handler(const int_frame *frame) {
-    printStrC("Invalid opcode exception catched\n\r", exColor);
-    printStr("\tcs:rip = 0x");
+    printStrC((const u8 *)"Invalid opcode exception catched\n\r", exColor);
+    printStr((const u8 *)"\tcs:rip = 0x");
     printStr(hex2strw((u16)(frame->cs)));
     printChar(':');
     printStr(hex2strq(frame->rip));
-    printStr("\n\r");
+    printStr((const u8 *)"\n\r");
     asm volatile("1:hlt;jmp 1b");
 }
 
 void exc07_handler(const int_frame */*frame*/) {
-    printStrC("Device unavailable exception catched\n\r", exColor);
+    printStrC((const u8 *)"Device unavailable exception catched\n\r", exColor);
 }
 
 void exc08_handler(const int_frame_err */*frame*/) {
-    printStrC("Double fault exception catched\n\r", exColor);
+    printStrC((const u8 *)"Double fault exception catched\n\r", exColor);
     genregs grs;
     gr_clear(&grs);
     gr_get(&grs);
@@ -127,15 +127,15 @@ void exc08_handler(const int_frame_err */*frame*/) {
 }
 
 void exc0a_handler(const int_frame_err */*frame*/) {
-    printStrC("Invalid TSS exception catched\n\r", exColor);
+    printStrC((const u8 *)"Invalid TSS exception catched\n\r", exColor);
 }
 
 void exc0b_handler(const int_frame_err */*frame*/) {
-    printStrC("Segment not present exception catched\n\r", exColor);
+    printStrC((const u8 *)"Segment not present exception catched\n\r", exColor);
 }
 
 void exc0c_handler(const int_frame_err */*frame*/) {
-    printStrC("Stack fault exception catched\n\r", exColor);
+    printStrC((const u8 *)"Stack fault exception catched\n\r", exColor);
 }
 
 void exc0d_handler(const int_frame_err *frame) {
@@ -147,33 +147,34 @@ void exc0d_handler(const int_frame_err *frame) {
     get_cs_rip(&cs, &rip);
     u16 ss = 0;
     asm volatile("movw %%ss, %0":"=r"(ss));
-    printStrC("General protection exception catched\r\n", exColor);
+    printStrC((const u8 *)"General protection exception catched\r\n", exColor);
     u64 errcode = frame->errorcode;
     if (errcode) {
-        printStr("\terrorcode = 0x");
+        printStr((const u8 *)"\terrorcode = 0x");
         printStr(hex2strq(errcode));
-        printStr("\n\r");
+        printStr((const u8 *)"\n\r");
     }
-    printStr("\t\t\t\tHANDLER\t\t\t\t|\t\t\t\tFAULT\r\n");
-    printStr("cs:rip = 0x");
+    printStr((const u8 *)"\t\t\t\tHANDLER\t\t\t\t|\t\t\t\tFAULT\r\n");
+    printStr((const u8 *)"cs:rip = 0x");
     printStr(hex2strw(cs));
-    printStr(": 0x");
+    printStr((const u8 *)": 0x");
     printStr(hex2strq(rip));
-    printStr("\t| 0x");
+    printStr((const u8 *)"\t| 0x");
     printStr(hex2strw((u16)(frame->cs)));
-    printStr(": 0x");
+    printStr((const u8 *)": 0x");
     printStr(hex2strq(frame->rip));
-    printStr("\r\nss:rsp = 0x");
+    printStr((const u8 *)"\r\nss:rsp = 0x");
     printStr(hex2strw(ss));
-    printStr(": 0x");
+    printStr((const u8 *)": 0x");
     printStr(hex2strq(rsp));
-    printStr("\t| 0x");
+    printStr((const u8 *)"\t| 0x");
     printStr(hex2strw((u16)(frame->ss)));
-    printStr(": 0x");
+    printStr((const u8 *)": 0x");
     printStr(hex2strq(frame->rsp));
-    printStr("\r\nHNDLR ");
+    printStr((const u8 *)"\r\n");
+    printStr((const u8 *)"HNDLR ");
     print_flags_impl(& rflag);
-    printStr("FAULT ");
+    printStr((const u8 *)"FAULT ");
     print_flags_impl((const rflags *)(frame->rflags));
     asm volatile("1:hlt;jmp 1b");
 }
@@ -182,72 +183,72 @@ void exc0e_handler(const int_frame_err *frame) {
     ctlregs crs;
     cr_clear(&crs);
     cr_get(&crs);
-    printStrC("Page fault exception catched\n\r", exColor);
+    printStrC((const u8 *)"Page fault exception catched\n\r", exColor);
     //TODO if (CPL <= CPL) {if (pageList.isFull()) pageList.freeLeastUsed(); allocateAndPutOnList(page); restore cr2 an iret;}
     u64 errcode = frame->errorcode;
-    printStr("\t(u16)errorcode = 0b");
+    printStr((const u8 *)"\t(u16)errorcode = 0b");
     printStr(bin2str(errcode, 16));
-    printStr("\n\r");
+    printStr((const u8 *)"\n\r");
     cr_print(&crs);
-    printStr("\tIA32_EFER.LME is ");
+    printStr((const u8 *)"\tIA32_EFER.LME is ");
     u64 retval = 0;
     asm volatile("pushq %%rcx; pushq %%rax; pushq %%rdx; mov $0xc0000080, %%ecx; "
         "rdmsr; movq %%rax, %0; popq %%rdx; popq %%rax; popq %%rcx;"
         :"=r"(retval)
     );
     if (!(retval & (1 << 8))) { // IA-32e mode operation disabled.
-        printStr("un");
+        printStr((const u8 *)"un");
     }
-    printStr("set.\n\r");
-    printStr("\tIA32_EFER.NXE is ");
+    printStr((const u8 *)"set.\n\r");
+    printStr((const u8 *)"\tIA32_EFER.NXE is ");
     if (!(retval & (1 << 11))) { //  execute_disabled access rughts.
-        printStr("un");
+        printStr((const u8 *)"un");
     }
-    printStr("set.\n\r");
-    printStr("\tcs:rip = 0x");
+    printStr((const u8 *)"set.\n\r");
+    printStr((const u8 *)"\tcs:rip = 0x");
     printStr(hex2strw((u16)(frame->cs)));
     printChar(':');
     printStr(hex2strq(frame->rip));
-    printStr("\n\r");
-    printStr("\tss:rsp = 0x");
+    printStr((const u8 *)"\n\r");
+    printStr((const u8 *)"\tss:rsp = 0x");
     printStr(hex2strw((u16)(frame->ss)));
     printChar(':');
     printStr(hex2strq(frame->rsp));
-    printStr("\n\r");
-    printStr("\trflags = 0b");
+    printStr((const u8 *)"\n\r");
+    printStr((const u8 *)"\trflags = 0b");
     printStr(bin2str(frame->rflags, 32));
-    printStr("\n\r");
+    printStr((const u8 *)"\n\r");
     asm volatile("mov %0, %%cr2"::"r"(crs.cr2)); //restore cr2
 }
 
 void exc10_handler(const int_frame */*frame*/) {
-    printStrC("x87 FPU exception catched\n\r", exColor);
+    printStrC((const u8 *)"x87 FPU exception catched\n\r", exColor);
 }
 
 void exc11_handler(const int_frame_err */*frame*/) {
-    printStrC("Align check exception catched\n\r", exColor);
+    printStrC((const u8 *)"Align check exception catched\n\r", exColor);
 }
 
 void exc12_handler(const int_frame */*frame*/) {
-    printStrC("Machine check exception catched\n\r", exColor);
+    printStrC((const u8 *)"Machine check exception catched\n\r", exColor);
 }
 
 void exc13_handler(const int_frame */*frame*/) {
-    printStrC("SIMD fpu exception catched\n\r", exColor);
+    printStrC((const u8 *)"SIMD fpu exception catched\n\r", exColor);
 }
 
 void exc14_handler(const int_frame */*frame*/) {
-    printStrC("Virtualization exception catched\n\r", exColor);
+    printStrC((const u8 *)"Virtualization exception catched\n\r", exColor);
 }
 
 void irq00_handler(const int_frame */*frame*/) {
-    klog("in 'void irq00_handler(int_frame *)'", __FILE__, __LINE__, TRACE);
+    klog((const u8 *)"in 'void irq00_handler(int_frame *)'", (const u8 *)__FILE__, __LINE__, TRACE);
     Tick();
     pic_sendEOI(PIC1_OFFSET + 0x00);
 }
 
 void irq01_handler(const int_frame */*frame*/) {
-    klog("in 'void irq01_handler(int_frame *)'", __FILE__, __LINE__, TRACE);
+    klog((const u8 *)"in 'void irq01_handler(int_frame *)'", (const u8 *)__FILE__, __LINE__, TRACE);
     u8 scancode = inb_wrap(0x60);
     u8 chr = 0x00;
 
@@ -258,16 +259,16 @@ void irq01_handler(const int_frame */*frame*/) {
 }
 
 void irq04_handler(const int_frame */*frame*/) {
-    printStrC("COM1 interruption catched\n\r", exColor);
+    printStrC((const u8 *)"COM1 interruption catched\n\r", exColor);
     pic_sendEOI(PIC1_OFFSET + 0x04);
 }
 
 void irq08_handler(const int_frame */*frame*/) {
-    printStrC("RTC interruption catched\n\r", exColor);
+    printStrC((const u8 *)"RTC interruption catched\n\r", exColor);
     pic_sendEOI(PIC1_OFFSET + 0x08);
 }
 
 void irq0c_handler(const int_frame */*frame*/) {
-    printStrC("PS/2 mouse interruption catched\n\r", exColor);
+    printStrC((const u8 *)"PS/2 mouse interruption catched\n\r", exColor);
     pic_sendEOI(PIC1_OFFSET + 0x0c);
 }

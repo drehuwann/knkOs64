@@ -116,7 +116,7 @@ u8 get_iopl_impl(const rflags*);
 void print_flags_impl(const rflags*); 
 int check_flags_impl(const rflags*, u64); 
 
-static inline const rflags get_rflags() {
+static inline rflags get_rflags() {
     rflags rfs;
     u64 raw_flags;
     asm volatile (

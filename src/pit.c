@@ -28,7 +28,7 @@ static const u64 BaseFrequency = 1193182;
     0            BCD/Binary mode: 0 = 16-bit binary, 1 = four-digit BCD
 */
 static bool init_pit() { //mode0, ch0, lo/hi, binary
-    klog("in 'bool init_pit()'", __FILE__, __LINE__, TRACE);
+    klog((const u8 *)"in 'bool init_pit()'", (const u8 *)__FILE__, __LINE__, TRACE);
     static bool done = false;
     if (! done) {
         outb(PIT_CMD, 0b00110000);
@@ -49,7 +49,7 @@ void Sleep(u64 milliseconds) {
 }
 
 void SetDivisor(u16 divisor){
-    klog("in 'void SetDivisor(u16)'", __FILE__, __LINE__, TRACE);
+    klog((const u8 *)"in 'void SetDivisor(u16)'", (const u8 *)__FILE__, __LINE__, TRACE);
     if (divisor < 100) divisor = 100;
     Divisor = divisor;
     outb(PIT_CH0, (u8)(divisor & 0x00ff));
@@ -61,7 +61,7 @@ u64 GetFrequency() {
 }
 
 void SetFrequency(u64 frequency) {
-    klog("in 'void SetFrequency(u64)'", __FILE__, __LINE__, TRACE);
+    klog((const u8 *)"in 'void SetFrequency(u64)'", (const u8 *)__FILE__, __LINE__, TRACE);
     if (init_pit()) SetDivisor(BaseFrequency / frequency);
 }
 

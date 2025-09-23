@@ -27,15 +27,15 @@ void _start() {
     setCursorPosition(posFromCoords(0, 0));
     printComPorts();
     if (initComPort(1)) {
-        printStr("COM1 serial port succesfully initialized. ");
+        printStr((const u8 *)"COM1 serial port succesfully initialized. ");
         setCurrentLogLevel(llvl);
-        printStr("Log level set to ");
-        printStr(lvlStr[llvl]);
+        printStr((const u8 *)"Log level set to ");
+        printStr(logLvlStr(llvl));
     } else {
-        printStrC("Couldn't initialize COM1 serial port",
+        printStrC((const u8 *)"Couldn't initialize COM1 serial port",
             BACKGROUND_BLACK | FOREGROUND_RED);
     }
-    printStr("\r\n");
+    printStr((const u8 *)"\r\n");
     SetFrequency(100); //init kernel timer to 100 Hz
     initIdt();
     idt_set_descriptor(0x00, &exc00_handler, IDT_GATE_TRAP);
@@ -83,19 +83,19 @@ void _start() {
 
     mmapentry const *heapzone = getLargestUsableMemRegion();
 
-    printStr("Selected region @0x");
+    printStr((const u8 *)"Selected region @0x");
     printStr(hex2str((void *)(heapzone->baseAddress)));
-    printStr(" for heap.\n\r");
+    printStr((const u8 *)" for heap.\n\r");
 
     initHeap(heapzone->baseAddress, heapzone->regionLength);
-    printStr("Succesfully assigned ");
+    printStr((const u8 *)"Succesfully assigned ");
     printStr(int2str(heapzone->regionLength));
-    printStr(" bytes at 0x");
+    printStr((const u8 *)" bytes at 0x");
     printStr(hex2str((void *)(heapzone->baseAddress)));
-    printStr(" as heap.\n\rFeel free to malloc() !!!\n\r");
-    printStr("Warning : realloc() doesn't preserve alignment.\n\r");
+    printStr((const u8 *)" as heap.\n\rFeel free to malloc() !!!\n\r");
+    printStr((const u8 *)"Warning : realloc() doesn't preserve alignment.\n\r");
     printStr(double2str(GetTimeSinceBoot(), 2));
-    printStr(" seconds elapsed since boot\n\r");
+    printStr((const u8 *)" seconds elapsed since boot\n\r");
 
 //test varargs and kprintf
     s16 a = -32;
@@ -107,75 +107,75 @@ void _start() {
     if (!(arg_push(p_arglist, make_arg_sw(&a)))) asm volatile("int $0x0d");
     if (!(arg_push(p_arglist, make_arg_ub(&yes)))) asm volatile("int $0x0d");
     if (!(arg_push(p_arglist, make_arg_ub(&no)))) asm volatile("int $0x0d");
-    kprintf("Did you see this %s : %d%% (%c/%c) ?", p_arglist);
-    printStr("\n\r");
+    kprintf((const u8 *)"Did you see this %s : %d%% (%c/%c) ?", p_arglist);
+    printStr((const u8 *)"\n\r");
     if(p_arglist) free(p_arglist);
 //TODO valgrind this !
 
     printStr(int2str((s64)(&_kernSize)));
-    printStr(" : This is kernel size (in 512byte sectors)\n\r");
-    printStr(" .text is from 0x");
+    printStr((const u8 *)" : This is kernel size (in 512byte sectors)\n\r");
+    printStr((const u8 *)" .text is from 0x");
     printStr(hex2str(&_btext));
-    printStr(" to 0x");
+    printStr((const u8 *)" to 0x");
     printStr(hex2str(&_etext));
-    printStr("\n\r");
-    printStr(" .idt is from 0x");
+    printStr((const u8 *)"\n\r");
+    printStr((const u8 *)" .idt is from 0x");
     printStr(hex2str(&_bidt));
-    printStr(" to 0x");
+    printStr((const u8 *)" to 0x");
     printStr(hex2str(&_eidt));
-    printStr("\n\r");
-    printStr(" .rodata is from 0x");
+    printStr((const u8 *)"\n\r");
+    printStr((const u8 *)" .rodata is from 0x");
     printStr(hex2str(&_brodata));
-    printStr(" to 0x");
+    printStr((const u8 *)" to 0x");
     printStr(hex2str(&_erodata));
-    printStr("\n\r");
-    printStr(" .bss is from 0x");
+    printStr((const u8 *)"\n\r");
+    printStr((const u8 *)" .bss is from 0x");
     printStr(hex2str(&_bbss));
-    printStr(" to 0x");
+    printStr((const u8 *)" to 0x");
     printStr(hex2str(&_ebss));
-    printStr("\n\r");
-    printStr(" .data is from 0x");
+    printStr((const u8 *)"\n\r");
+    printStr((const u8 *)" .data is from 0x");
     printStr(hex2str(&_bdata));
-    printStr(" to 0x");
+    printStr((const u8 *)" to 0x");
     printStr(hex2str(&_edata));
-    printStr("\n\r");
+    printStr((const u8 *)"\n\r");
 
     pmBitmapInit();
-    printStr("the first free mem page is ");
+    printStr((const u8 *)"the first free mem page is ");
     printStr(int2str((s64)pmBitmap_first_free()));
-    printStr("\n\r");
+    printStr((const u8 *)"\n\r");
 
     void *p1 = pm_alloc_block();
-    printStr("allocated page @0x");
+    printStr((const u8 *)"allocated page @0x");
     printStr(hex2str(p1));
-    printStr("\n\r");
+    printStr((const u8 *)"\n\r");
     void *p2 = pm_alloc_block();
-    printStr("allocated page @0x");
+    printStr((const u8 *)"allocated page @0x");
     printStr(hex2str(p2));
-    printStr("\n\r");
+    printStr((const u8 *)"\n\r");
     pm_free_block(p1);
-    printStr("freed page @0x");
+    printStr((const u8 *)"freed page @0x");
     printStr(hex2str(p1));
-    printStr("\n\r");
+    printStr((const u8 *)"\n\r");
     p1 = pm_alloc_block();
-    printStr("allocated page @0x");
+    printStr((const u8 *)"allocated page @0x");
     printStr(hex2str(p1));
-    printStr("\n\r");
+    printStr((const u8 *)"\n\r");
     void *p3 = (void *)0x2000;
     pm_free_block(p3);
-    printStr("tried to free page @0x");
+    printStr((const u8 *)"tried to free page @0x");
     printStr(hex2str(p3));
-    printStr("\n\r");
+    printStr((const u8 *)"\n\r");
     void *p4 = pm_alloc_block();
-    printStr("allocated page @0x");
+    printStr((const u8 *)"allocated page @0x");
     printStr(hex2str(p4));
-    printStr("\n\r");
+    printStr((const u8 *)"\n\r");
     pm_free_block(p1); //freeing all
     pm_free_block(p2);
     pm_free_block(p4);
 
     printStr(double2str(GetTimeSinceBoot(), 2));
-    printStr(" seconds elapsed since boot\n\r");
+    printStr((const u8 *)" seconds elapsed since boot\n\r");
 
     jump_usermode();
     return;

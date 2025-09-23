@@ -7,16 +7,16 @@ u64 *const pmBitmapAddr = (u64 *)(&_kernend);
 
 void printmmap(const mmapentry *mmap, u16 pos) {
     setCursorPosition(pos);
-    printStr("Memory base : 0x");
+    printStr((const u8 *)"Memory base : 0x");
     printStr(hex2strq(mmap->baseAddress));
     setCursorPosition(pos + VGAWIDTH);
-    printStr("Region length : ");
+    printStr((const u8 *)"Region length : ");
     printStr(int2str(mmap->regionLength));
     setCursorPosition(pos + 2 * VGAWIDTH);
-    printStr("Region type : ");
+    printStr((const u8 *)"Region type : ");
     printStr(int2str(mmap->regionType));
     setCursorPosition(pos + 3 * VGAWIDTH);
-    printStr("Extended attributes : 0x");
+    printStr((const u8 *)"Extended attributes : 0x");
     printStr(hex2strd(mmap->extendedAttributes));
     setCursorPosition(pos + 5 * VGAWIDTH);
 }
@@ -98,13 +98,12 @@ void pmBitmapInit() {
 u64 pmBitmap_first_free() {
 	//! find the first free bit
 	for (u64 i=0; i < blk_count / 64; i++) {
-		if (pmBitmapAddr[i] != 0xffffffffffffffff) {
-			for (int j=0; j<64; j++) {		//! test each bit in the qword
-				int bit = 1 << j;
-				if (! (pmBitmapAddr[i] & bit) ) {
-					return i * 64 + j;
-                }
-			}
+		if (pmBitmapAddr[i] == 0xffffffffffffffff)
+            continue;
+		for (int j=0; j<64; j++) {		//! test each bit in the qword
+			int bit = 1 << j;
+			if (! (pmBitmapAddr[i] & bit) )
+                return i * 64 + j;
         }
     }
     return 0; //out of memory
@@ -112,7 +111,8 @@ u64 pmBitmap_first_free() {
 
 void *pm_alloc_block() {
 	u64 frame = pmBitmap_first_free();
-	if (frame == 0) return (void *)0;	//out of memory
+	if (frame == 0)
+        return (void *)0;	//out of memory
     pmBitmap_set(frame);
     void *addr = (void *)(frame * 0x1000);
     return addr;
